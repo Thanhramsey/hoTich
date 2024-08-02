@@ -2,7 +2,7 @@
   <div>
     <section>
       <section class="mb-5">
-        <h2 class="mb-5">Get Token</h2>
+        <h2 class="mb-5">Get Token(Dùng ở local)</h2>
       </section>
       <hr class="mb-5" />
     <div>
@@ -14,7 +14,7 @@
         <input type="password" id="password" v-model="password" required />
       </div>
     <button @click="getToken">Get Token</button>
-     <!-- <p v-if="token">Token: {{ token }}</p> -->
+     <p v-if="token">Token: {{ token }}</p>
     </section>
 
     <section>
@@ -78,8 +78,7 @@ export default {
     
 
    async getToken() {
-      // const tokenUrl = '/api/token'; // Sử dụng proxy
-      const tokenUrl = 'https://cors-anywhere.herokuapp.com/https://congdichvu.gialai.gov.vn/token';
+      const tokenUrl = '/api/token'; // Sử dụng proxy
       const authHeader = `Basic ${btoa(`${this.username}:${this.password}`)}`;
       
       const data = new URLSearchParams();
@@ -171,7 +170,7 @@ export default {
 };
 </script>
 
-<style>
+<style scoped>
 .textarea {
   width: 100%; /* Chiều rộng 100% của phần tử chứa */
   height: 100px; /* Chiều cao cụ thể */
