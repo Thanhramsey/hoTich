@@ -75,7 +75,7 @@ export default {
 
    async getToken() {
       // const tokenUrl = '/api/token'; // Sử dụng proxy
-      const tokenUrl = 'https://congdichvu.gialai.gov.vn/token';
+      const tokenUrl = 'https://cors-anywhere.herokuapp.com/https://congdichvu.gialai.gov.vn/token';
       const authHeader = `Basic ${btoa(`${this.username}:${this.password}`)}`;
       
       const data = new URLSearchParams();
