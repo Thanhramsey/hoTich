@@ -85,6 +85,7 @@ export default {
         const response = await axios.post(tokenUrl, data, {
           headers: {
             'Authorization': authHeader,
+            "Access-Control-Allow-Origin ":"*",
             'Content-Type': 'application/x-www-form-urlencoded'
           }
         });
