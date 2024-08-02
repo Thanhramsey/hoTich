@@ -73,10 +73,44 @@ export default {
   methods: {
     
 
-   async getToken() {
-      const tokenUrl = '/api/token'; // Sử dụng proxy
-      const authHeader = `Basic ${btoa(`${this.username}:${this.password}`)}`;
+  //  async getToken() {
+  //     const tokenUrl = '/api/token'; // Sử dụng proxy
+  //     const authHeader = `Basic ${btoa(`${this.username}:${this.password}`)}`;
       
+  //     const data = new URLSearchParams();
+  //     data.append('grant_type', 'client_credentials');
+
+  //     try {
+  //       const response = await axios.post(tokenUrl, data, {
+  //         headers: {
+  //           'Authorization': authHeader,
+  //           'Content-Type': 'application/x-www-form-urlencoded'
+  //         }
+  //       });
+  //       console.log('Token:', response.data);
+  //       this.token = response.data.access_token; 
+  //     } catch (error) {
+  //       if (error.response) {
+  //         // Máy chủ đã phản hồi với mã trạng thái nằm ngoài phạm vi 2xx
+  //         console.error('Dữ liệu phản hồi lỗi:', error.response.data);
+  //         console.error('Trạng thái phản hồi lỗi:', error.response.status);
+  //         console.error('Header phản hồi lỗi:', error.response.headers);
+  //       } else if (error.request) {
+  //         // Yêu cầu đã được thực hiện nhưng không nhận được phản hồi
+  //         console.error('Yêu cầu lỗi:', error.request);
+  //       } else {
+  //         // Một lỗi đã xảy ra trong quá trình thiết lập yêu cầu
+  //         console.error('Thông báo lỗi:', error.message);
+  //       }
+  //       console.error('Cấu hình lỗi:', error.config);
+  //     }
+  //   }, 
+      async getToken() {
+      const proxyUrl = 'https://cors-anywhere.herokuapp.com/';
+      const apiUrl = 'https://congdichvu.gialai.gov.vn/token';
+      const tokenUrl = `${proxyUrl}${apiUrl}`;
+      const authHeader = `Basic ${btoa(`${this.username}:${this.password}`)}`;
+
       const data = new URLSearchParams();
       data.append('grant_type', 'client_credentials');
 
@@ -91,20 +125,18 @@ export default {
         this.token = response.data.access_token; 
       } catch (error) {
         if (error.response) {
-          // Máy chủ đã phản hồi với mã trạng thái nằm ngoài phạm vi 2xx
           console.error('Dữ liệu phản hồi lỗi:', error.response.data);
           console.error('Trạng thái phản hồi lỗi:', error.response.status);
           console.error('Header phản hồi lỗi:', error.response.headers);
         } else if (error.request) {
-          // Yêu cầu đã được thực hiện nhưng không nhận được phản hồi
           console.error('Yêu cầu lỗi:', error.request);
         } else {
-          // Một lỗi đã xảy ra trong quá trình thiết lập yêu cầu
           console.error('Thông báo lỗi:', error.message);
         }
         console.error('Cấu hình lỗi:', error.config);
       }
-    }, 
+    },
+
     async fetchData() {
      
       const url = `https://apiigate.gialai.gov.vn/pa/dossier/${this.hsoId}/--online`;
