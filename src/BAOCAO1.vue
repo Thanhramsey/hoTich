@@ -38,8 +38,9 @@
       <section class="mt-5">
           <h2 class="mb-5">Đẩy qua hộ tịch</h2>
            <button @click="pushHoTich" style="color:white;font-weight:bold;width: 150px;padding: 10px;margin: 10px 0;border: 1px solid #bbbbbb !important;border-radius: 4px;box-sizing: border-box;font-size: 16px;background-color: rgb(38, 113, 184) !important;">Đẩy qua hộ tịch</button>
-            <p v-if="requestBody" style="color:red">Body gửi đi: {{ requestBody }}</p>
-            <p v-if="responseHT" style="color:purple">responseHT: {{ responseHT }}</p>
+            <p v-if="requestBody" style="color:red; display: none">Body gửi đi: {{ requestBody }}</p>
+            <textarea v-model="requestBodyString" style="width: 100%; height: 200px;"></textarea>
+            <p v-if="responseHT" style="color:purple">Kết quả trả về từ hộ tịch: {{ responseHT }}</p>
       </section>
     </section>
   </div>
@@ -72,7 +73,8 @@ export default {
         ngayTiepNhan: '',
         data: ''
       },
-      responseHT:""
+      responseHT:"",
+      requestBodyString:""
     };
   },
   methods: {
@@ -159,6 +161,7 @@ export default {
         let innerXML = jsonToXml(this.eformData);
         this.requestBody.data = `<hotich><hoso>${innerXML}</hoso></hotich>`;
         this.responseHT = "";
+        this.requestBodyString = JSON.stringify(this.requestBody, null, 2);
       } catch (error) {
         if (error.response) {
           console.error('Dữ liệu phản hồi lỗi:', error.response.data);
@@ -238,7 +241,9 @@ export default {
     //   }
     // },
       async pushHoTich() {
-      const url = 'https://congdichvu.gialai.gov.vn:443/hotich/1.0/dangKyHoTich';          
+      const url = 'https://congdichvu.gialai.gov.vn:443/hotich/1.0/dangKyHoTich';  
+      this.requestBody = JSON.parse(this.requestBodyString); // Chuyển requestBodyString về dạng object
+      console.log(this.requestBody);        
       console.log(this.requestBody);
         try {
           const response = await axios.post(url, this.requestBody, {
