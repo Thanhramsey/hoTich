@@ -74,14 +74,15 @@ export default {
     
 
    async getToken() {
-      const tokenUrl = '/api/token'; // Sử dụng proxy
+      // const tokenUrl = '/api/token'; // Sử dụng proxy
+      const tokenUrl = 'https://congdichvu.gialai.gov.vn/token';
       const authHeader = `Basic ${btoa(`${this.username}:${this.password}`)}`;
       
       const data = new URLSearchParams();
       data.append('grant_type', 'client_credentials');
 
       try {
-        const response = await axios.post("https://congdichvu.gialai.gov.vn", data, {
+        const response = await axios.post(tokenUrl, data, {
           headers: {
             'Authorization': authHeader,
             'Content-Type': 'application/x-www-form-urlencoded'
