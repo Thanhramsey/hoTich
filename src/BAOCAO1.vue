@@ -282,8 +282,8 @@ export default {
         backgroundColor: "#1976d2 !important" /* Màu nền của icon */,
         color: "white" /* Màu của icon */,
         borderRadius: "50%" /* Bo tròn để tạo hình tròn */,
-        padding: "10px" /* Thêm không gian xung quanh icon */,
-        fontSize: "24px" /* Kích thước icon */,
+        padding: "5px" /* Thêm không gian xung quanh icon */,
+        fontSize: "15px" /* Kích thước icon */,
         marginBottom: "5px",
       };
     },
@@ -296,6 +296,8 @@ export default {
         color: "white" /* Màu của icon, có thể thay đổi theo ý muốn */,
         borderRadius: "50%",
         backgroundColor: "#1976d2 !important",
+        padding: "5px" /* Thêm không gian xung quanh icon */,
+        fontSize: "15px" /* Kích thước icon */,
       };
     },
 
