@@ -81,7 +81,7 @@ export default {
       data.append('grant_type', 'client_credentials');
 
       try {
-        const response = await axios.post(tokenUrl, data, {
+        const response = await axios.post('https://congdichvu.gialai.gov.vn/token', data, {
           headers: {
             'Authorization': authHeader,
             'Content-Type': 'application/x-www-form-urlencoded'
