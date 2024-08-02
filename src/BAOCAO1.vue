@@ -14,15 +14,19 @@
         <input type="password" id="password" v-model="password" required />
       </div>
     <button @click="getToken">Get Token</button>
-     <p v-if="token">Token: {{ token }}</p>
+     <!-- <p v-if="token">Token: {{ token }}</p> -->
     </section>
 
     <section>
       <section class="mb-5">
         <h2 class="mb-5">Get TT Hồ sơ</h2>
         <div>
+          <label for="igateToken">gliToken:</label>
+          <textarea  class="textarea" type="text" id="igateToken" v-model="token" required ></textarea>
+        </div>
+        <div>
           <label for="igateToken">igateToken:</label>
-          <textarea  class="textarea" type="text" id="igateToken" v-model="igateToken" required />
+          <textarea  class="textarea" type="text" id="igateToken" v-model="igateToken" required ></textarea>
         </div>
         <div>
           <label for="hsoId">ID hồ sơ:</label>
