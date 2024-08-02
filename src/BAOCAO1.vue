@@ -171,7 +171,7 @@ export default {
 </script>
 
 <style scoped>
-.textarea {
+textarea {
   width: 100%; /* Chiều rộng 100% của phần tử chứa */
   height: 100px; /* Chiều cao cụ thể */
   box-sizing: border-box; /* Đảm bảo kích thước bao gồm padding và border */
