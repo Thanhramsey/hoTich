@@ -158,7 +158,7 @@
                   <v-card-actions>
                     <v-spacer></v-spacer>
                     <v-btn
-                      style="color: white"
+                      style="color: white; background-color: #1976d2 !important"
                       text
                       @click="notificationDialog = false"
                       >Close</v-btn
@@ -284,7 +284,7 @@ export default {
         borderRadius: "50%" /* Bo tròn để tạo hình tròn */,
         padding: "10px" /* Thêm không gian xung quanh icon */,
         fontSize: "24px" /* Kích thước icon */,
-        width: "50px",
+        marginBottom: "5px",
       };
     },
     closeIconStyle() {
@@ -295,7 +295,7 @@ export default {
         cursor: "pointer" /* Thay đổi con trỏ khi hover */,
         color: "white" /* Màu của icon, có thể thay đổi theo ý muốn */,
         borderRadius: "50%",
-        width: "50px",
+        backgroundColor: "#1976d2 !important",
       };
     },
 
