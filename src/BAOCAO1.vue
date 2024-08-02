@@ -13,7 +13,7 @@
         <label for="password">Password:</label>
         <input type="password" id="password" v-model="password" required style="width: 100%;padding: 10px;margin: 10px 0;border: 1px solid #bbbbbb !important;border-radius: 4px;box-sizing: border-box;font-size: 16px;" />
       </div>
-    <button @click="getToken" style="width: 150px;padding: 10px;margin: 10px 0;border: 1px solid #bbbbbb !important;border-radius: 4px;box-sizing: border-box;font-size: 16px;background-color: rgb(38, 113, 184) !important;">Get Token</button>
+    <button @click="getToken" style="color:white;font-weight:bold;width: 150px;padding: 10px;margin: 10px 0;border: 1px solid #bbbbbb !important;border-radius: 4px;box-sizing: border-box;font-size: 16px;background-color: rgb(38, 113, 184) !important;">Get Token</button>
      <p v-if="token">Token: {{ token }}</p>
     </section>
 
@@ -21,23 +21,23 @@
       <section class="mb-5">
         <h2 class="mb-5">Get TT Hồ sơ</h2>
         <div>
-          <label for="igateToken">gliToken:</label>
+          <label for="igateToken" style="font-size: large;font-weight: bold;">gliToken:</label>
           <textarea  class="textarea" type="text" id="igateToken" v-model="token" required style="width: 100%; height: 100px;box-sizing: border-box; border: 1px solid #bbbbbb !important;"></textarea>
         </div>
         <div>
-          <label for="igateToken">igateToken:</label>
+          <label for="igateToken" style="font-size: large;font-weight: bold;">igateToken:</label>
           <textarea  class="textarea" type="text" id="igateToken" v-model="igateToken" required style="width: 100%; height: 100px;box-sizing: border-box; border: 1px solid #bbbbbb !important;"></textarea>
         </div>
         <div>
-          <label for="maHso">Mã hồ sơ:</label>
+          <label for="maHso" style="font-size: large;font-weight: bold;">Mã hồ sơ:</label>
           <input type="text" id="maHso" v-model="maHso" required style="width: 100%;padding: 10px;margin: 10px 0;border: 1px solid #bbbbbb !important;border-radius: 4px;box-sizing: border-box;font-size: 16px;"/>
         </div>         
         <p v-if="eformData" style="color:red;display: none;">eformData: {{ eformData }}</p>
-        <button @click="fetchData" style="width: 150px;padding: 10px;margin: 10px 0;border: 1px solid #bbbbbb !important;border-radius: 4px;box-sizing: border-box;font-size: 16px;background-color: rgb(38, 113, 184) !important;">Get TT Hồ sơ</button>
+        <button @click="fetchData" style="color:white;font-weight:bold;width: 150px;padding: 10px;margin: 10px 0;border: 1px solid #bbbbbb !important;border-radius: 4px;box-sizing: border-box;font-size: 16px;background-color: rgb(38, 113, 184) !important;">Get TT Hồ sơ</button>
       </section>
       <section class="mt-5">
           <h2 class="mb-5">Đẩy qua hộ tịch</h2>
-           <button @click="pushHoTich" style="width: 150px;padding: 10px;margin: 10px 0;border: 1px solid #bbbbbb !important;border-radius: 4px;box-sizing: border-box;font-size: 16px;background-color: rgb(38, 113, 184) !important;">Đẩy qua hộ tịch</button>
+           <button @click="pushHoTich" style="color:white;font-weight:bold;width: 150px;padding: 10px;margin: 10px 0;border: 1px solid #bbbbbb !important;border-radius: 4px;box-sizing: border-box;font-size: 16px;background-color: rgb(38, 113, 184) !important;">Đẩy qua hộ tịch</button>
             <p v-if="requestBody" style="color:red">Body gửi đi: {{ requestBody }}</p>
             <p v-if="responseHT" style="color:purple">responseHT: {{ responseHT }}</p>
       </section>
