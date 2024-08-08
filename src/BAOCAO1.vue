@@ -230,8 +230,8 @@
               ></v-progress-circular>
               Get TT Hồ sơ
             </v-btn>
-            <p v-if="donViNop"><b>Hồ sơ của đơn vị: {{ donViNop }}</b></p>
-            <p v-if="noiDangKy"><b>Nơi đăng ký trong eform: {{ noiDangKy }}</b></p>
+            <p v-if="donViNop" style="color: red;"><b>Hồ sơ của đơn vị: {{ donViNop }}</b></p>
+            <p v-if="noiDangKy" style="color: red;"><b>Nơi đăng ký trong eform: {{ noiDangKy }}</b></p>
           </section>
           <section class="mt-5">
             <h2 class="mb-5">Đẩy qua hộ tịch</h2>
@@ -259,7 +259,7 @@
             </p>
             <textarea
               v-model="requestBodyString"
-              style="width: 100%; height: 300px"
+              style="width: 100%; height: 300px;  box-sizing: border-box;   border: 1px solid #bbbbbb !important;"
             ></textarea>
             <p v-if="responseHT" style="color: purple">
               Kết quả trả về từ hộ tịch: {{ responseHT }}
