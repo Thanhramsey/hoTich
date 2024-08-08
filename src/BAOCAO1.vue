@@ -230,6 +230,8 @@
               ></v-progress-circular>
               Get TT Hồ sơ
             </v-btn>
+            <p v-if="donViNop"><b>Hồ sơ của đơn vị: {{ donViNop }}</b></p>
+            <p v-if="noiDangKy"><b>Nơi đăng ký trong eform: {{ noiDangKy }}</b></p>
           </section>
           <section class="mt-5">
             <h2 class="mb-5">Đẩy qua hộ tịch</h2>
@@ -272,6 +274,9 @@
 <script>
 import axios from "axios";
 import { jsonToXml } from "./jsonToXml.js";
+import dviJson from './dviJson.json';
+import noiDangKyJson from './noiDangKy.json';
+
 
 export default {
   components: {},
@@ -335,6 +340,10 @@ export default {
       notificationMessage: "",
       isSuccess: false,
       loading: false,
+      dViData : dviJson,
+      noiDangKyJson: noiDangKyJson,
+      donViNop:"",
+      noiDangKy:""
     };
   },
   methods: {
@@ -434,9 +443,17 @@ export default {
         this.requestBody.data = `<hotich><hoso>${innerXML}</hoso></hotich>`;
         this.responseHT = "";
         this.requestBodyString = JSON.stringify(this.requestBody, null, 2);
-
         this.isSuccess = true;
         this.notificationMessage = "Get thông tin hồ sơ thành công";
+
+        let agency = response.data.agency.code;
+        let dvi = this.dViData.content.find(room => room.code === agency);
+        this.donViNop = dvi.name;
+        
+        var maNoiDangKy = response.data.eForm.data.noiDangKy;
+        let noiDangKyName = this.noiDangKyJson.find(data => data.maDonViHanhChinh === maNoiDangKy);
+        this.noiDangKy = noiDangKyName.tenDonViHanhChinh;
+
         this.showError();
       } catch (error) {
         this.isSuccess = false;
