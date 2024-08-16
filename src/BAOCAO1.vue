@@ -447,12 +447,15 @@ export default {
         this.notificationMessage = "Get thông tin hồ sơ thành công";
 
         let agency = response.data.agency.code;
-        let dvi = this.dViData.content.find(room => room.code === agency);
-        this.donViNop = dvi.name;
+        if(agency){
+          let dvi = this.dViData.content.find(room => room.code === agency);
+          this.donViNop = dvi.name;
+          
+          var maNoiDangKy = response.data.eForm.data.noiDangKy;
+          let noiDangKyName = this.noiDangKyJson.find(data => data.maDonViHanhChinh === maNoiDangKy);
+          this.noiDangKy = noiDangKyName.tenDonViHanhChinh;
+        }
         
-        var maNoiDangKy = response.data.eForm.data.noiDangKy;
-        let noiDangKyName = this.noiDangKyJson.find(data => data.maDonViHanhChinh === maNoiDangKy);
-        this.noiDangKy = noiDangKyName.tenDonViHanhChinh;
 
         this.showError();
       } catch (error) {
