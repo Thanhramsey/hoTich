@@ -18,11 +18,7 @@
       ></v-progress-linear>
 
       <!-- Process Button -->
-      <v-btn
-        @click="processFile"
-      >
-        Process Addresses
-      </v-btn>
+      <v-btn @click="processFile"> Process Addresses </v-btn>
 
       <!-- Processed Addresses Table -->
       <v-data-table
@@ -79,7 +75,8 @@ export default {
 
         json.forEach((row, index) => {
           if (index > 0) {
-            this.addresses.push(row[1]); // Assuming column 2 is the address
+            let simAddress = this.simplifyAddress(row[1]);
+            this.addresses.push(simAddress); // Assuming column 2 is the address
           }
         });
 
@@ -107,13 +104,13 @@ export default {
     },
 
     async getCoordinates(address) {
-      let simplifiedAddress = this.simplifyAddress(address);
+      // let simplifiedAddress = this.simplifyAddress(address);
       try {
         const response = await axios.get(
           `https://nominatim.openstreetmap.org/search`,
           {
             params: {
-              q: simplifiedAddress,
+              q: address,
               format: "json",
               limit: 1,
             },
@@ -159,21 +156,25 @@ export default {
 
     simplifyAddress(address) {
       const replacements = [
-        { find: "Tổ", replace: "" },
-        { find: "tổ", replace: "" },
-        { find: "Hẻm", replace: "" },
-        { find: "hẻm", replace: "" },
-        { find: "P.", replace: "Phường " },
-        { find: "p.", replace: "Phường " },
-        { find: "Q.", replace: "Quận " },
-        { find: "TP.", replace: "Thành Phố " },
-        { find: "tp.", replace: "Thành Phố " },
-        { find: "H.", replace: "Huyện " },
+        { find: "\\bTP\\.?\\s*\\b", replace: "Thành phố " },
+        { find: "\\bTp\\.?\\s*\\b", replace: "Thành phố " },
+        { find: "\\bp\\.\\s*\\b", replace: "Phường " },
+        { find: "\\bP\\.\\s*\\b", replace: "Phường " },
+        { find: "\\bQ\\.\\s*\\b", replace: "Quận " },
+        { find: "\\bH\\.\\s*\\b", replace: "Huyện " },
+        { find: "\\bh\\.\\s*\\b", replace: "Huyện " },
+        // { find: "\\bT\\.\\s*\\b", replace: "Tổ " },
+        { find: "\\bHẻm\\b", replace: "" },
       ];
 
       let simplifiedAddress = address;
+
+      // Sử dụng biểu thức chính quy để thay thế chính xác
       replacements.forEach((item) => {
-        simplifiedAddress = simplifiedAddress.replace(item.find, item.replace);
+        simplifiedAddress = simplifiedAddress.replace(
+          new RegExp(item.find, "gi"),
+          item.replace
+        );
       });
 
       return simplifiedAddress;

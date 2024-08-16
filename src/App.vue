@@ -34,7 +34,7 @@ export default {
       tab: null,
       items: [
         { tab: "Get Token", content: "BAOCAO1" },
-        { tab: "Đăng ký hộ tịch", content: "BAOCAO2" },
+        { tab: "Get tọa độ", content: "BAOCAO2" },
       ],
     };
   },
