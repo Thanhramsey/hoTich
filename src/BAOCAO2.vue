@@ -19,7 +19,6 @@
 
       <!-- Process Button -->
       <v-btn
-        :disabled="!file || progress > 0"
         @click="processFile"
       >
         Process Addresses
@@ -108,12 +107,13 @@ export default {
     },
 
     async getCoordinates(address) {
+      let simplifiedAddress = this.simplifyAddress(address);
       try {
         const response = await axios.get(
           `https://nominatim.openstreetmap.org/search`,
           {
             params: {
-              q: address,
+              q: simplifiedAddress,
               format: "json",
               limit: 1,
             },
@@ -160,10 +160,14 @@ export default {
     simplifyAddress(address) {
       const replacements = [
         { find: "Tổ", replace: "" },
+        { find: "tổ", replace: "" },
         { find: "Hẻm", replace: "" },
+        { find: "hẻm", replace: "" },
         { find: "P.", replace: "Phường " },
+        { find: "p.", replace: "Phường " },
         { find: "Q.", replace: "Quận " },
-        { find: "TP", replace: "Thành Phố " },
+        { find: "TP.", replace: "Thành Phố " },
+        { find: "tp.", replace: "Thành Phố " },
         { find: "H.", replace: "Huyện " },
       ];
 
