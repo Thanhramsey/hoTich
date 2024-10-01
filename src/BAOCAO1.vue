@@ -318,8 +318,8 @@ export default {
   },
   data() {
     return {
-      username: "imsqeSUzd7YRbvAoAoZvKkOPx0Ia",
-      password: "YcJE_MIA9Wo9Vijr8lz8vUQJde8a",
+      username: "",
+      password: "",
       token: "",
       maHso: "",
       hsoId: "",
