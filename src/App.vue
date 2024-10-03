@@ -22,11 +22,12 @@
 <script>
 import BAOCAO1 from "./BAOCAO1";
 import BAOCAO2 from "./BAOCAO2";
-
+import BAOCAO3 from "./BAOCAO3";
 export default {
   components: {
     BAOCAO1,
     BAOCAO2,
+    BAOCAO3,
   },
   data() {
     return {
@@ -35,6 +36,7 @@ export default {
       items: [
         { tab: "Get Token", content: "BAOCAO1" },
         { tab: "Get tọa độ", content: "BAOCAO2" },
+        { tab: "Tạo object", content: "BAOCAO3" },
       ],
     };
   },
