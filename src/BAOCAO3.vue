@@ -1,55 +1,67 @@
 <template>
   <v-container>
-    <v-textarea
-      label="Nhập chuỗi"
-      v-model="inputString"
-      rows="5"
-      outlined
-    ></v-textarea>
+    <v-textarea v-model="input" label="Nhập các trường" rows="5"></v-textarea>
 
-    <v-row style="margin: 10px">
-      <v-btn
-        @click="generateJavaCode"
-        color="primary"
-        style="
-          color: white;
-          font-weight: bold;
-          width: 150px;
-          padding: 10px;
-          margin: 10px 0;
-          border: 1px solid #bbbbbb !important;
-          border-radius: 4px;
-          box-sizing: border-box;
-          font-size: 16px;
-          background-color: rgb(38, 113, 184) !important;
-        "
-        >Java Code</v-btn
-      >
-      <v-btn
-        @click="generateJson"
-        color="secondary"
-        style="
-          color: white;
-          font-weight: bold;
-          width: 150px;
-          padding: 10px;
-          margin: 10px 0;
-          border: 1px solid #bbbbbb !important;
-          border-radius: 4px;
-          box-sizing: border-box;
-          font-size: 16px;
-          background-color: rgb(38, 113, 184) !important;
-        "
-        >JSON</v-btn
-      >
-    </v-row>
+    <!-- Nút thứ 1: Tạo @JsonProperty -->
+    <v-btn
+      @click="generateJsonProperty"
+      style="
+        color: white;
+        font-weight: bold;
+        width: 200px;
+        padding: 10px;
+        margin: 10px;
+        border: 1px solid #bbbbbb !important;
+        border-radius: 4px;
+        box-sizing: border-box;
+        font-size: 13px;
+        background-color: rgb(38, 113, 184) !important;
+      "
+      >Tạo @JsonProperty</v-btn
+    >
 
+    <!-- Nút thứ 2: Tạo JSON object -->
+    <v-btn
+      @click="generateJsonObject"
+      style="
+        color: white;
+        font-weight: bold;
+        width: 200px;
+        padding: 10px;
+        margin: 10px;
+        border: 1px solid #bbbbbb !important;
+        border-radius: 4px;
+        box-sizing: border-box;
+        font-size: 13px;
+        background-color: rgb(38, 113, 184) !important;
+      "
+      >Tạo JSON Object</v-btn
+    >
+
+    <!-- Nút thứ 3: Tạo body. format -->
+    <v-btn
+      @click="generateBodyFormat"
+      style="
+        color: white;
+        font-weight: bold;
+        width: 200px;
+        padding: 10px;
+        margin: 10px;
+        border: 1px solid #bbbbbb !important;
+        border-radius: 4px;
+        box-sizing: border-box;
+        font-size: 13px;
+        background-color: rgb(38, 113, 184) !important;
+      "
+      >Tạo body. format</v-btn
+    >
+
+    <!-- Kết quả xuất ra -->
     <v-textarea
-      label="Kết quả"
       v-model="output"
-      rows="10"
-      outlined
+      label="Kết quả"
       readonly
+      rows="10"
     ></v-textarea>
   </v-container>
 </template>
@@ -58,26 +70,54 @@
 export default {
   data() {
     return {
-      inputString: "", // Lưu trữ chuỗi nhập vào
-      output: "", // Kết quả đầu ra
+      input: "", // Chuỗi đầu vào từ textarea
+      output: "", // Kết quả sinh ra
     };
   },
   methods: {
-    // Hàm xử lý cho nút 1: Tạo Java code
-    generateJavaCode() {
-      const lines = this.inputString.trim().split(/\s+/); // Tách các chuỗi nhập vào theo dòng
-      let result = lines
-        .map((line) => `@JsonProperty("${line}")\n    private String ${line};`)
-        .join("\n\n"); // Tạo format Java
+    // Hàm loại bỏ "ps", "PS", "p0", "P0"
+    cleanField(field) {
+      return field.replace(/^(ps|PS|p0|P0)/, ""); // Loại bỏ tiền tố "ps", "PS", "p0", "P0"
+    },
+
+    // Hàm sinh ra @JsonProperty
+    generateJsonProperty() {
+      const fields = this.input
+        .split("\n")
+        .filter((field) => field.trim() !== "");
+      const cleanedFields = fields.map(this.cleanField); // Loại bỏ tiền tố trước khi xử lý
+      const result = cleanedFields
+        .map(
+          (field) =>
+            `@JsonProperty("${field.trim()}")\nprivate String ${field.trim()};`
+        )
+        .join("\n\n");
       this.output = result;
     },
 
-    // Hàm xử lý cho nút 2: Tạo JSON
-    generateJson() {
-      const lines = this.inputString.trim().split(/\s+/); // Tách các chuỗi nhập vào theo dòng
-      let result =
-        "{\n" + lines.map((line) => `  "${line}": ""`).join(",\n") + "\n}"; // Tạo format JSON
-      this.output = result;
+    // Hàm sinh ra JSON object
+    generateJsonObject() {
+      const fields = this.input
+        .split("\n")
+        .filter((field) => field.trim() !== "");
+      const cleanedFields = fields.map(this.cleanField); // Loại bỏ tiền tố trước khi xử lý
+      const result = cleanedFields
+        .map((field) => `"${field.trim()}": ""`)
+        .join(",\n");
+      this.output = `{\n${result}\n}`;
+    },
+
+    // Hàm sinh ra body.MA_HD, body.MA_KH, body.MA_CQ và dòng chứa dấu '?'
+    generateBodyFormat() {
+      const fields = this.input
+        .split("\n")
+        .filter((field) => field.trim() !== "");
+      const cleanedFields = fields.map(this.cleanField); // Loại bỏ tiền tố trước khi xử lý
+      const resultBody = cleanedFields
+        .map((field) => `body.${field.trim()}`)
+        .join(",\n");
+      const resultQuestionMarks = cleanedFields.map(() => "?").join(", ");
+      this.output = `${resultBody},\n${resultQuestionMarks}`;
     },
   },
 };
