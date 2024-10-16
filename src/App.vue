@@ -23,11 +23,13 @@
 import BAOCAO1 from "./BAOCAO1";
 import BAOCAO2 from "./BAOCAO2";
 import BAOCAO3 from "./BAOCAO3";
+import BAOCAO4 from "./BAOCAO4";
 export default {
   components: {
     BAOCAO1,
     BAOCAO2,
     BAOCAO3,
+    BAOCAO4,
   },
   data() {
     return {
@@ -37,6 +39,7 @@ export default {
         { tab: "Get Token", content: "BAOCAO1" },
         { tab: "Get tọa độ", content: "BAOCAO2" },
         { tab: "Tạo object", content: "BAOCAO3" },
+        { tab: "Clone quy trình", content: "BAOCAO4" },
       ],
     };
   },
