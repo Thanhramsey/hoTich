@@ -75,6 +75,9 @@
     <!-- Textfield nhập code -->
     <v-row>
       <v-col>
+        <v-text-field label="Mã id " v-model="prefix" outlined></v-text-field>
+      </v-col>
+      <v-col>
         <label>Chọn văn phòng đăng ký đất đai</label>
         <select
           placeholder="Chọn văn phòng"
@@ -113,9 +116,6 @@
         ></v-text-field>
       </v-col>
       <!-- Textfield nhập tiền tố -->
-      <v-col>
-        <v-text-field label="Mã id " v-model="prefix" outlined></v-text-field>
-      </v-col>
     </v-row>
     <!-- Nút gọi API -->
     <v-row>
