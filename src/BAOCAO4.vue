@@ -203,7 +203,7 @@ export default {
       processingTime: "",
       listDonvi: donviJson,
       apDungDonViReq: {
-        processingTime: 10,
+        processingTime: "",
         processingTimeUnit: "d",
         applicantEForm: {
           id: "6652e73bd4696e0018acefa4",
@@ -406,6 +406,7 @@ export default {
             this.code = response.data.code;
             this.name = response.data.name;
             this.processingTime = response.data.processingTime;
+            this.apDungDonViReq.processingTime = this.processingTime;
             this.definedTask = response.data.definedTask;
             this.processDefinition = response.data;
             this.isSuccess2 = true;
