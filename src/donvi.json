@@ -1,4 +1,5 @@
-[
+{
+    "content": [
   {
       "id": "6635a42f2f006c34b683c320",
       "name": "Bộ phận một cửa chi nhánh Văn phòng Đăng ký đất đai  thị xã An Khê",
@@ -532,7 +533,7 @@
   },
   {
       "id": "6635a42f2f006c34b683c332",
-      "name": "Bộ phận một cửa chi nhánh Văn phòng Đăng ký đất đai huyện Mang Yang",
+      "name": "Bộ phận một cửa Chi nhánh Văn phòng Đăng ký đất đai huyện Mang Yang",
       "code": "H21.14.01.1212",
       "parent": "6635a42e2f006c34b683c30e",
       "logoId": null,
@@ -1570,3 +1571,4 @@
       }
   }
 ]
+}

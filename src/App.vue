@@ -33,13 +33,13 @@ export default {
   },
   data() {
     return {
-      tableTitle: "Cuộc thi",
-      tab: null,
+      tableTitle: "MTP",
+      tab: 0,
       items: [
         { tab: "Get Token", content: "BAOCAO1" },
         { tab: "Get tọa độ", content: "BAOCAO2" },
         { tab: "Tạo object", content: "BAOCAO3" },
-        { tab: "Clone quy trình", content: "BAOCAO4" },
+        { tab: "Clone quy trình DD", content: "BAOCAO4" },
       ],
     };
   },
