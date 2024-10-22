@@ -24,12 +24,14 @@ import BAOCAO1 from "./BAOCAO1";
 import BAOCAO2 from "./BAOCAO2";
 import BAOCAO3 from "./BAOCAO3";
 import BAOCAO4 from "./BAOCAO4";
+import BAOCAO5 from "./BAOCAO5";
 export default {
   components: {
     BAOCAO1,
     BAOCAO2,
     BAOCAO3,
     BAOCAO4,
+    BAOCAO5,
   },
   data() {
     return {
@@ -40,6 +42,7 @@ export default {
         { tab: "Get tọa độ", content: "BAOCAO2" },
         { tab: "Tạo object", content: "BAOCAO3" },
         { tab: "Clone quy trình DD", content: "BAOCAO4" },
+        { tab: "Clone xã", content: "BAOCAO5" },
       ],
     };
   },

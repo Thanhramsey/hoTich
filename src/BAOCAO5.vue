@@ -1,142 +1,63 @@
 <template>
-  <div id="attach-dialog-bc2">
-    <v-container>
-      <!-- Textarea để nhập token -->
-      <v-dialog
-        v-model="notificationDialog2"
-        max-width="700px"
-        persistent
-        attach="#attach-dialog-bc2"
-      >
-        <v-card>
-          <v-card-title class="headline">
-            <span v-if="isSuccess2">Success</span>
-            <span v-else>Error</span>
-          </v-card-title>
-          <v-card-text>
-            <v-alert
-              :type="isSuccess2 ? 'success' : 'error'"
-              border="left"
-              colored-border
-            >
-              {{ notificationMessage2 }}
-            </v-alert>
-          </v-card-text>
-          <v-card-actions>
-            <v-spacer></v-spacer>
+  <div id="attach-dialog-bc5">
+    <v-app>
+      <v-container>
+        <v-row>
+          <v-col>
+            <v-textarea label="Token" v-model="token" outlined></v-textarea>
+          </v-col>
+          <v-col>
+            <!-- Textfield nhập processId -->
+            <v-text-field
+              label="Quy trình ID"
+              v-model="processId"
+              outlined
+            ></v-text-field>
+          </v-col>
+          <v-col>
+            <v-text-field
+              label="Mã quy trình"
+              v-model="code"
+              outlined
+            ></v-text-field>
+          </v-col>
+          <!-- Textfield nhập name -->
+          <v-col>
+            <v-text-field
+              label="Tên quy trình"
+              v-model="name"
+              outlined
+            ></v-text-field>
+          </v-col>
+          <v-col>
             <v-btn
-              style="color: white; background-color: #1976d2 !important"
-              text
-              @click="notificationDialog2 = false"
-              >Close</v-btn
+              @click="getProcessInfo(processId)"
+              style="
+                color: white;
+                font-weight: bold;
+                width: auto;
+                padding: 10px;
+                margin: 10px 0;
+                border: 1px solid #bbbbbb !important;
+                border-radius: 4px;
+                box-sizing: border-box;
+                font-size: 16px;
+                background-color: rgb(38, 113, 184) !important;
+              "
+              >INFO QT Clone</v-btn
             >
-          </v-card-actions>
-        </v-card>
-      </v-dialog>
-      <v-progress-circular
-        attach="#attach-dialog-bc2"
-        v-if="loading2"
-        indeterminate
-        color="white"
-        size="20"
-        class="ml-2"
-      ></v-progress-circular>
-      <v-row>
-        <v-col>
-          <v-textarea label="Token" v-model="token" outlined></v-textarea>
-        </v-col>
-        <v-col>
-          <!-- Textfield nhập processId -->
-          <v-text-field
-            label="Quy trình ID"
-            v-model="processId"
-            outlined
-          ></v-text-field>
-        </v-col>
-        <v-col>
-          <v-btn
-            @click="getProcessInfo(processId)"
-            style="
-              color: white;
-              font-weight: bold;
-              width: auto;
-              padding: 10px;
-              margin: 10px 0;
-              border: 1px solid #bbbbbb !important;
-              border-radius: 4px;
-              box-sizing: border-box;
-              font-size: 16px;
-              background-color: rgb(38, 113, 184) !important;
-            "
-            >Get INFO quy trình Clone</v-btn
-          >
-        </v-col>
-      </v-row>
-      <!-- Textfield nhập code -->
-      <v-row>
-        <v-col>
-          <v-text-field label="Mã id " v-model="prefix" outlined></v-text-field>
-        </v-col>
-        <v-col>
-          <label>Chọn văn phòng đăng ký đất đai</label>
-          <select
-            placeholder="Chọn văn phòng"
-            v-model="selectedItem"
-            @change="changeAgency"
-            style="
-              height: 40px;
-              font-weight: bold;
-              width: auto;
-              padding: 10px;
-              margin: 10px 0;
-              border: 1px solid #bbbbbb !important;
-              border-radius: 4px;
-              box-sizing: border-box;
-            "
-          >
-            <option value="" disabled>Chọn văn phòng đăng ký đất đai</option>
-            <option v-for="item in donvis" :key="item.id" :value="item.id">
-              {{ item.name }}
-            </option>
-          </select>
-        </v-col>
-        <v-col>
-          <v-text-field
-            label="Mã quy trình"
-            v-model="code"
-            outlined
-          ></v-text-field>
-        </v-col>
-        <!-- Textfield nhập name -->
-        <v-col>
-          <v-text-field
-            label="Tên quy trình"
-            v-model="name"
-            outlined
-          ></v-text-field>
-        </v-col>
-        <!-- Textfield nhập tiền tố -->
-      </v-row>
-      <!-- Nút gọi API -->
-      <v-row>
-        <v-col>
-          <v-btn
-            @click="CreateNameCode"
-            style="
-              color: white;
-              font-weight: bold;
-              width: auto;
-              height: 40px;
-              padding: 10px;
-              margin: 0px 10px;
-              border: 1px solid #bbbbbb !important;
-              border-radius: 4px;
-              box-sizing: border-box;
-              font-size: 16px;
-              background-color: rgb(38, 113, 184) !important;
-            "
-            >Tạo tên,code</v-btn
-          >
+          </v-col>
+        </v-row>
+        <v-row>
+          <v-combobox
+            v-model="selectedBranch"
+            @change="getXa"
+            :items="capHuyens"
+            item-value="id"
+            item-text="name"
+            label="Chọn huyện"
+            attach="#attach-dialog-bc5"
+          ></v-combobox>
           <v-btn
             @click="cloneProcess2"
             :disabled="loading2"
@@ -156,9 +77,8 @@
             >Clone Quy Trình</v-btn
           >
 
-          <v-btn
-            @click="appplyProcess"
-            :disabled="loading2"
+          <!-- <v-btn
+            @click="dummyFunction"
             style="
               color: white;
               font-weight: bold;
@@ -172,26 +92,80 @@
               font-size: 16px;
               background-color: rgb(38, 113, 184) !important;
             "
-            >Áp dụng các bước</v-btn
+            >Reset</v-btn
+          > -->
+        </v-row>
+
+        <v-row>
+          <!-- Data Table hiển thị xã -->
+          <v-data-table
+            v-if="filteredCommunes.length"
+            :headers="communeHeaders"
+            :items="filteredCommunes"
+            item-value="id"
+            class="mt-5"
+            :items-per-page="30"
+            no-data-text="Không có xã nào phù hợp"
+            show-select
+            v-model="selectedCommunes"
           >
-        </v-col>
-      </v-row>
-    </v-container>
+            <template v-slot:item.tenQT="{ item }">
+              <!-- Khi ô được click, chuyển thành v-text-field để chỉnh sửa -->
+              <v-text-field
+                v-if="editingItemId === item.id"
+                v-model="item.tenQT"
+                @blur="stopEditing(item)"
+                @keyup.enter="stopEditing(item)"
+                label="Edit name"
+                dense
+                hide-details
+              />
+              <span v-else @click="startEditing(item)">{{ item.tenQT }}</span>
+            </template>
+
+            <template v-slot:item.maQT="{ item }">
+              <!-- Khi ô được click, chuyển thành v-text-field để chỉnh sửa -->
+              <v-text-field
+                v-if="editingItemId === item.id"
+                v-model="item.maQT"
+                @blur="stopEditing(item)"
+                @keyup.enter="stopEditing(item)"
+                label="Edit mã QT"
+                dense
+                hide-details
+              />
+              <span v-else @click="startEditing(item)">{{ item.maQT }}</span>
+            </template>
+          </v-data-table>
+        </v-row>
+      </v-container>
+    </v-app>
   </div>
 </template>
 
 <script>
 import axios from "axios";
 import donviJson from "./donvi.json";
+// import capHuyen from "./capHuyen.json";
+import capXa from "./capXa.json";
 export default {
   created() {},
+  computed: {
+    filteredCommunes() {
+      if (!this.selectedBranch) return [];
+      return this.capXas.content.filter(
+        (commune) => commune.parent === this.selectedBranch.id
+      );
+    },
+  },
   data() {
     return {
+      // ID của xã đang chỉnh sửa
       loading2: false,
       notificationDialog2: false,
       notificationMessage2: "",
       isSuccess2: false,
-      token: "", // Biến chứa token từ textarea
+      token: "",
       processId: "", // Biến chứa processId từ textfield
       code: "", // Biến chứa code từ textfield
       name: "", // Biến chứa name từ textfield
@@ -202,6 +176,7 @@ export default {
       selectedItem: null,
       search: "",
       processingTime: "",
+      editingItemId: null,
       listDonvi: donviJson,
       apDungDonViReq: {
         processingTime: "",
@@ -227,9 +202,9 @@ export default {
         },
         appliedAgency: [
           {
-            id: "6635a42e2f006c34b683c2f8",
-            name: "Chi nhánh Văn phòng Đăng ký đất đai TP Pleiku",
-            parent: "66359bbece635e4fa0955ab7",
+            id: "",
+            name: "",
+            parent: "",
             isChecked: true,
             level: 2,
             expandable: true,
@@ -237,121 +212,183 @@ export default {
         ],
       },
 
-      donvis: [
+      capXas: capXa,
+      communeHeaders: [
+        { text: "ID", value: "id" },
+        { text: "Tên Xã", value: "name" },
+        { text: "Tên Quy trình", value: "tenQT" },
+        { text: "MÃ Quy trình", value: "maQT" },
+        { text: "Trạng Thái", value: "logoId" },
+      ],
+      selectedCommunes: [],
+
+      capHuyens: [
         {
-          id: "6635a42e2f006c34b683c31a",
-          name: "Bộ phận tiếp nhận văn phòng đăng ký đất đai tỉnh Gia lai.",
-          code: "H21.14.0101",
-          tenTat: "GLI",
+          id: "66090d95162cb160f8906385",
+          name: "UBND Huyện Chư Prông",
+          code: "H21.52",
+          tenTat: "chuprong",
         },
         {
-          id: "6635a42e2f006c34b683c2fc",
-          name: "Chi nhánh Văn phòng Đăng ký đất đai  thị xã An Khê",
-          code: "H21.14.01.03",
-          tenTat: "ANKHE",
+          id: "6619f691bfe89f70f2596e86",
+          name: "UBND huyện Chư Păh",
+          code: "H21.51",
+          tenTat: "chupah",
         },
         {
-          id: "6635a42e2f006c34b683c2fa",
-          name: "Chi nhánh Văn phòng Đăng ký đất đai  thị xã Ayun Pa",
-          code: "H21.14.01.02",
-          tenTat: "AYUNPA",
+          id: "66052492162cb160f89060a6",
+          name: "UBND huyện Chư Pưh",
+          code: "H21.53",
+          tenTat: "chupuh",
         },
         {
-          id: "6635a42e2f006c34b683c2f8",
-          name: "Chi nhánh Văn phòng Đăng ký đất đai TP Pleiku",
-          code: "H21.14.01.01",
-          tenTat: "PLEIKU",
+          id: "6619f691bfe89f70f2596e88",
+          name: "UBND huyện Chư Sê",
+          code: "H21.54",
+          tenTat: "chuse",
         },
         {
-          id: "6635a42e2f006c34b683c302",
-          name: "Chi nhánh Văn phòng Đăng ký đất đai huyện Chư Prông",
-          code: "H21.14.01.06",
-          tenTat: "CHUPRONG",
+          id: "6619f691bfe89f70f2596e8e",
+          name: "UBND huyện Ia Grai",
+          code: "H21.58",
+          tenTat: "iagrai",
         },
         {
-          id: "6635a42e2f006c34b683c316",
-          name: "Chi nhánh Văn phòng Đăng ký đất đai huyện Chư Păh",
-          code: "H21.14.01.16",
-          tenTat: "CHUPAH",
+          id: "6619f691bfe89f70f2596e90",
+          name: "UBND huyện Ia Pa",
+          code: "H21.59",
+          tenTat: "iapa",
         },
         {
-          id: "6635a42e2f006c34b683c300",
-          name: "Chi nhánh Văn phòng Đăng ký đất đai huyện Chư Pưh",
-          code: "H21.14.01.05",
-          tenTat: "CHUPUH",
+          id: "6619f692bfe89f70f2596e98",
+          name: "UBND huyện Mang Yang",
+          code: "H21.63",
+          tenTat: "mangyang",
         },
         {
-          id: "6635a42e2f006c34b683c2fe",
-          name: "Chi nhánh Văn phòng Đăng ký đất đai huyện Chư Sê",
-          code: "H21.14.01.04",
-          tenTat: "CHUSE",
+          id: "6619f692bfe89f70f2596e9a",
+          name: "UBND huyện Phú Thiện",
+          code: "H21.64",
+          tenTat: "phuthien",
         },
         {
-          id: "6635a42e2f006c34b683c314",
-          name: "Chi nhánh Văn phòng Đăng ký đất đai huyện Ia Grai",
-          code: "H21.14.01.15",
-          tenTat: "IAGRAI",
+          id: "6619f691bfe89f70f2596e8c",
+          name: "UBND huyện Đak Pơ",
+          code: "H21.56",
+          tenTat: "dakpo",
         },
         {
-          id: "6635a42e2f006c34b683c308",
-          name: "Chi nhánh Văn phòng Đăng ký đất đai huyện Ia Pa",
-          code: "H21.14.01.09",
-          tenTat: "IAPA",
+          id: "6619f691bfe89f70f2596e8a",
+          name: "UBND huyện Đak Đoa",
+          code: "H21.55",
+          tenTat: "dakdoa",
         },
         {
-          id: "6635a42e2f006c34b683c318",
-          name: "Chi nhánh Văn phòng Đăng ký đất đai huyện KBang",
-          code: "H21.14.01.17",
-          tenTat: "KBANG",
+          id: "6619f17bbfe89f70f2596e82",
+          name: "UBND huyện Đức Cơ",
+          code: "H21.57",
+          tenTat: "ducco",
         },
         {
-          id: "6635a42e2f006c34b683c306",
-          name: "Chi nhánh Văn phòng Đăng ký đất đai huyện Krông Pa",
-          code: "H21.14.01.08",
-          tenTat: "KRONGPA",
+          id: "6619f692bfe89f70f2596e9e",
+          name: "UBND thị xã An Khê",
+          code: "H21.66",
+          tenTat: "ankhe",
         },
         {
-          id: "6635a42e2f006c34b683c310",
-          name: "Chi nhánh Văn phòng Đăng ký đất đai huyện Kông Chro",
-          code: "H21.14.01.13",
-          tenTat: "KONGCHRO",
+          id: "66174303bfe89f70f2596e15",
+          name: "UBND thị xã Ayun Pa",
+          code: "H21.67",
+          tenTat: "ayunpa",
         },
         {
-          id: "6635a42e2f006c34b683c30e",
-          name: "Chi nhánh Văn phòng Đăng ký đất đai huyện Mang Yang",
-          code: "H21.14.01.12",
-          tenTat: "MANGYANG",
+          id: "6619f692bfe89f70f2596e9c",
+          name: "UBND thành phố Pleiku",
+          code: "H21.65",
+          tenTat: "pleiku",
         },
         {
-          id: "6635a42e2f006c34b683c304",
-          name: "Chi nhánh Văn phòng Đăng ký đất đai huyện Phú Thiện",
-          code: "H21.14.01.07",
-          tenTat: "PHUTHIEN",
+          id: "6619f691bfe89f70f2596e92",
+          name: "UBND huyện KBang",
+          code: "H21.60",
+          tenTat: "kbang",
         },
         {
-          id: "6635a42e2f006c34b683c30c",
-          name: "Chi nhánh Văn phòng Đăng ký đất đai huyện Đak Pơ",
-          code: "H21.14.01.11",
-          tenTat: "DAKPO",
+          id: "6619f692bfe89f70f2596e96",
+          name: "UBND huyện Krông Pa",
+          code: "H21.62",
+          tenTat: "krongpa",
         },
         {
-          id: "6635a42e2f006c34b683c30a",
-          name: "Chi nhánh Văn phòng Đăng ký đất đai huyện Đak Đoa",
-          code: "H21.14.01.10",
-          tenTat: "DAKDOA",
-        },
-        {
-          id: "6635a42e2f006c34b683c312",
-          name: "Chi nhánh Văn phòng Đăng ký đất đai huyện Đức Cơ",
-          code: "H21.14.01.14",
-          tenTat: "DUCCO",
+          id: "6619f692bfe89f70f2596e94",
+          name: "UBND huyện Kông Chro",
+          code: "H21.61",
+          tenTat: "kongchro",
         },
       ],
+      selectedBranch: {
+        id: "",
+        name: "",
+        code: "",
+        tenTat: "",
+      },
       receptionInfo: {},
       selectObj: {},
     };
   },
   methods: {
+    startEditing(item) {
+      this.editingItemId = item.id; // Đặt ID của item đang chỉnh sửa
+    },
+    // Kết thúc chỉnh sửa
+    stopEditing() {
+      this.editingItemId = null; // Đặt lại ID, kết thúc chỉnh sửa
+    },
+    dummyFunction() {
+      console.log("selectedCommunes", this.selectedCommunes);
+    },
+
+    getXa() {
+      if (this.name != "") {
+        this.filteredCommunes.forEach((item) => {
+          item.editing = false;
+
+          let shortName = item.name.replace(
+            /(UBND\s+thị trấn|UBND\s+xã|UBND\s+phường)\s+/i,
+            ""
+          );
+          let tenTat = shortName.toLowerCase().replace(/\s+/g, "");
+          item.tenTat = tenTat;
+          item.tenQT =
+            this.selectedBranch.tenTat + "-" + tenTat + "-" + this.name;
+          item.maQT =
+            this.code + "-" + this.selectedBranch.tenTat + "-" + tenTat;
+        });
+
+        console.log(this.filteredCommunes);
+      }
+    },
+
+    // resetScreen() {
+    //   // Lưu lại giá trị của token và processId
+    //   this.code = ""; // Biến chứa code từ textfield
+    //   this.name = ""; // Biến chứa name từ textfield
+    //   this.prefix = ""; // Biến chứa tiền tố
+    //   this.processCloneId = "";
+    //   this.definedTask = "";
+    //   this.processDefinition = "";
+    //   this.selectedItem = null;
+    //   this.search = "";
+    //   this.processingTime = "";
+    //   this.editingItemId = null;
+    //   this.selectedBranch = {
+    //     id: "",
+    //     name: "",
+    //     code: "",
+    //     tenTat: "",
+    //   };
+    // },
+
     showError2() {
       this.notificationDialog2 = true; // Mở dialog
     },
@@ -365,32 +402,28 @@ export default {
       }
       this.code = "VBDLIS-" + this.selectObj.tenTat + "_" + this.prefix;
     },
-    changeAgency() {
-      this.donvis.forEach((item) => {
-        if (this.selectedItem == item.id) {
-          this.apDungDonViReq.appliedAgency[0].id = item.id;
-          this.apDungDonViReq.appliedAgency[0].name = item.name;
-          this.apDungDonViReq.appliedAgency[0].parent = item.parent;
-          this.selectObj = item;
-        }
-      });
+    // changeAgency() {
+    //   this.donvis.forEach((item) => {
+    //     if (this.selectedItem == item.id) {
+    //       this.apDungDonViReq.appliedAgency[0].id = item.id;
+    //       this.apDungDonViReq.appliedAgency[0].name = item.name;
+    //       this.apDungDonViReq.appliedAgency[0].parent = item.parent;
+    //       this.selectObj = item;
+    //     }
+    //   });
 
-      this.listDonvi.content.forEach((item) => {
-        // console.log(
-        //   item.code.includes(this.selectObj.code) &&
-        //     item.name.includes("Bộ phận")
-        // );
-        if (
-          item.code.includes(this.selectObj.code) &&
-          item.name.includes("Bộ phận")
-        ) {
-          this.receptionInfo.id = item.id;
-          this.receptionInfo.name = item.name;
-          this.receptionInfo.parent = item.parent;
-          this.receptionInfo.code = item.code;
-        }
-      });
-    },
+    //   this.listDonvi.content.forEach((item) => {
+    //     if (
+    //       item.code.includes(this.selectObj.code) &&
+    //       item.name.includes("Bộ phận")
+    //     ) {
+    //       this.receptionInfo.id = item.id;
+    //       this.receptionInfo.name = item.name;
+    //       this.receptionInfo.parent = item.parent;
+    //       this.receptionInfo.code = item.code;
+    //     }
+    //   });
+    // },
 
     async getProcessInfo(processId) {
       try {
@@ -424,40 +457,50 @@ export default {
     },
 
     async cloneProcess2() {
+      if (this.selectedCommunes.length == 0) {
+        alert("Chưa có tích ô nào hết");
+      }
       try {
-        // Gọi API clone quy trình
-        this.loading2 = true;
-        const response = await axios.post(
-          "https://apiigate.gialai.gov.vn/bpm/process-definition/--clone-process",
-          {
-            processId: this.processId,
-            code: this.code,
-            name: this.name, // Nối tiền tố với name
-          },
-          {
-            headers: {
-              Authorization: `Bearer ${this.token}`, // Đính kèm token vào header
+        for (let process of this.selectedCommunes) {
+          // Gọi API clone quy trình
+          this.loading2 = true;
+          const response = await axios.post(
+            "https://apiigate.gialai.gov.vn/bpm/process-definition/--clone-process",
+            {
+              processId: this.processId,
+              code: process.maQT,
+              name: process.tenQT, // Nối tiền tố với name
             },
-          }
-        );
+            {
+              headers: {
+                Authorization: `Bearer ${this.token}`, // Đính kèm token vào header
+              },
+            }
+          );
 
-        // Lấy ID từ API clone
-        this.processCloneId = response.data.id;
+          // Lấy ID từ API clone
+          this.processCloneId = response.data.id;
 
-        // Gọi API thứ hai với method PUT và payload
-        const response2 = await axios.put(
-          `https://apiigate.gialai.gov.vn/bpm/process-definition/${this.processCloneId}/--properties`,
-          this.apDungDonViReq,
-          {
-            headers: {
-              Authorization: `Bearer ${this.token}`, // Đính kèm token vào header (nếu cần)
-            },
-          }
-        );
-        this.getProcessInfo(this.processCloneId);
-        this.isSuccess2 = true;
-        this.notificationMessage2 = "Clone thành công";
-        console.log("Kết quả từ API thứ hai: ", response2.data);
+          // Gọi API thứ hai với method PUT và payload
+
+          this.apDungDonViReq.appliedAgency[0].id = process.id;
+          this.apDungDonViReq.appliedAgency[0].name = process.name;
+          this.apDungDonViReq.appliedAgency[0].parent = process.parent;
+          const response2 = await axios.put(
+            `https://apiigate.gialai.gov.vn/bpm/process-definition/${this.processCloneId}/--properties`,
+            this.apDungDonViReq,
+            {
+              headers: {
+                Authorization: `Bearer ${this.token}`, // Đính kèm token vào header (nếu cần)
+              },
+            }
+          );
+          console.log(response2);
+          await this.getProcessInfo(this.processCloneId);
+          await this.appplyProcess(process);
+
+          this.selectedCommunes = [];
+        }
       } catch (error) {
         this.isSuccess2 = false;
         this.notificationMessage2 = "Clone không thành công";
@@ -468,10 +511,8 @@ export default {
       }
     },
 
-    async appplyProcess() {
+    async appplyProcess(process) {
       try {
-        this.loading2 = true;
-        this.notificationMessage2 = "Áp dụng không thành công";
         for (const task of this.definedTask) {
           const taskDefinitionKey = task.id; // Lấy task-definition-key từ từng task
           if (taskDefinitionKey != "root") {
@@ -487,28 +528,43 @@ export default {
 
               const originalJson = taskResponse.data;
 
-              let oldAgency = originalJson.candidateGroup;
+              // let oldAgency = originalJson.candidateGroup;
 
-              let agency;
-              if (oldAgency[0].name[0].name.includes("Bộ phận")) {
-                agency = this.receptionInfo;
-              } else {
-                agency = this.selectObj;
+              // let agency;
+              // if (oldAgency[0].name[0].name.includes("Bộ phận")) {
+              //   agency = this.receptionInfo;
+              // } else {
+              //   agency = this.selectObj;
+              // }
+              // let parent = null;
+              // if (agency.parent != undefined) {
+              //   parent = {
+              //     id: agency.parent,
+              //   };
+              // }
+              let childItem = this.capXas.content.find(
+                (item) => item.parent === process.id
+              );
+              if (!childItem) {
+                return 0;
               }
+              console.log("childItem:", childItem);
+
               let parent = null;
-              if (agency.parent != undefined) {
+              if (childItem.parent != undefined) {
                 parent = {
-                  id: agency.parent,
+                  id: childItem.parent,
                 };
               }
+
               const candidateGroupNew = [
                 {
-                  id: agency.id,
-                  code: agency.code,
+                  id: childItem.id,
+                  code: childItem.code,
                   name: [
                     {
                       languageId: 228,
-                      name: agency.name,
+                      name: childItem.name,
                     },
                   ],
                   tag: null,
@@ -644,6 +700,7 @@ export default {
               console.log(response.data);
               this.isSuccess2 = true;
               this.notificationMessage2 = "Áp dụng thành công";
+              process.logoId = "hoàn thành";
             } catch (error) {
               console.error(`Error for task :`, error);
               this.isSuccess2 = false;
