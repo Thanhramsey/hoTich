@@ -2,7 +2,7 @@
   <div>
     <v-app>
       <v-container>
-        <section>
+        <section style="display: none">
           <section class="mb-5">
             <h2 class="mb-5">Get Token(Dùng ở local)</h2>
           </section>
@@ -230,8 +230,30 @@
               ></v-progress-circular>
               Get TT Hồ sơ
             </v-btn>
-            <p v-if="donViNop" style="color: red;"><b>Hồ sơ của đơn vị: {{ donViNop }}</b></p>
-            <p v-if="noiDangKy" style="color: red;"><b>Nơi đăng ký trong eform: {{ noiDangKy }}</b></p>
+            <v-btn
+              @click="endHoSo"
+              :disabled="loading"
+              variant="outlined"
+              style="
+                color: white;
+                font-weight: bold;
+                width: auto;
+                padding: 20px;
+                margin: 10px 0;
+                border: 1px solid #bbbbbb !important;
+                border-radius: 4px;
+                box-sizing: border-box;
+                font-size: 16px;
+                background-color: rgb(38, 113, 184) !important;
+              "
+              >Kết thúc hồ sơ</v-btn
+            >
+            <p v-if="donViNop" style="color: red">
+              <b>Hồ sơ của đơn vị: {{ donViNop }}</b>
+            </p>
+            <p v-if="noiDangKy" style="color: red">
+              <b>Nơi đăng ký trong eform: {{ noiDangKy }}</b>
+            </p>
           </section>
           <section class="mt-5">
             <h2 class="mb-5">Đẩy qua hộ tịch</h2>
@@ -259,7 +281,12 @@
             </p>
             <textarea
               v-model="requestBodyString"
-              style="width: 100%; height: 300px;  box-sizing: border-box;   border: 1px solid #bbbbbb !important;"
+              style="
+                width: 100%;
+                height: 300px;
+                box-sizing: border-box;
+                border: 1px solid #bbbbbb !important;
+              "
             ></textarea>
             <p v-if="responseHT" style="color: purple">
               Kết quả trả về từ hộ tịch: {{ responseHT }}
@@ -274,9 +301,8 @@
 <script>
 import axios from "axios";
 import { jsonToXml } from "./jsonToXml.js";
-import dviJson from './dviJson.json';
-import noiDangKyJson from './noiDangKy.json';
-
+import dviJson from "./dviJson.json";
+import noiDangKyJson from "./noiDangKy.json";
 
 export default {
   components: {},
@@ -340,10 +366,10 @@ export default {
       notificationMessage: "",
       isSuccess: false,
       loading: false,
-      dViData : dviJson,
+      dViData: dviJson,
       noiDangKyJson: noiDangKyJson,
-      donViNop:"",
-      noiDangKy:""
+      donViNop: "",
+      noiDangKy: "",
     };
   },
   methods: {
@@ -418,6 +444,58 @@ export default {
       }
     },
 
+    async endHoSo() {
+      this.loading = true;
+      await this.getHsoId();
+      if (this.hsoId) {
+        await this.endProcess();
+      }
+    },
+
+    async endProcess() {
+      this.loading = true;
+      if (this.hsoId == "") {
+        this.loading = false;
+        this.notificationMessage = "Không có thông tin";
+        this.isSuccess = false;
+        this.showError();
+      } else {
+        const url =
+          "https://apiigate.gialai.gov.vn/pa/dossier/--force-end-process";
+        this.requestBody = [
+          {
+            id: this.hsoId,
+            code: this.maHso,
+          },
+        ]; // Chuyển requestBodyString về dạng object
+        console.log(this.requestBody);
+        try {
+          const response = await axios.put(url, this.requestBody, {
+            headers: {
+              Authorization: `Bearer ${this.igateToken}`,
+              "Content-Type": "application/json", // Content-Type của body là JSON
+            },
+          });
+          console.log("Response:", response.data);
+
+          this.notificationMessage = "Thành công";
+          this.isSuccess = true;
+        } catch (error) {
+          this.notificationMessage = error.response
+            ? error.response.data
+            : error.message;
+          this.isSuccess = false;
+          console.error(
+            "Error:",
+            error.response ? error.response.data : error.message
+          );
+        } finally {
+          this.loading = false; // Kết thúc hiển thị loader
+          this.showError();
+        }
+      }
+    },
+
     async getData() {
       const url = `https://apiigate.gialai.gov.vn/pa/dossier/${this.hsoId}/--online`;
 
@@ -447,15 +525,16 @@ export default {
         this.notificationMessage = "Get thông tin hồ sơ thành công";
 
         let agency = response.data.agency.code;
-        if(agency){
-          let dvi = this.dViData.content.find(room => room.code === agency);
+        if (agency) {
+          let dvi = this.dViData.content.find((room) => room.code === agency);
           this.donViNop = dvi.name;
-          
+
           var maNoiDangKy = response.data.eForm.data.noiDangKy;
-          let noiDangKyName = this.noiDangKyJson.find(data => data.maDonViHanhChinh === maNoiDangKy);
+          let noiDangKyName = this.noiDangKyJson.find(
+            (data) => data.maDonViHanhChinh === maNoiDangKy
+          );
           this.noiDangKy = noiDangKyName.tenDonViHanhChinh;
         }
-        
 
         this.showError();
       } catch (error) {
