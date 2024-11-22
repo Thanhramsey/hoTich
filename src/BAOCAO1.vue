@@ -462,7 +462,7 @@ export default {
       } else {
         const url =
           "https://apiigate.gialai.gov.vn/pa/dossier/--force-end-process";
-        this.requestBody = [
+        var endRequestBody = [
           {
             id: this.hsoId,
             code: this.maHso,
@@ -470,7 +470,7 @@ export default {
         ]; // Chuyển requestBodyString về dạng object
         console.log(this.requestBody);
         try {
-          const response = await axios.put(url, this.requestBody, {
+          const response = await axios.put(url, endRequestBody, {
             headers: {
               Authorization: `Bearer ${this.igateToken}`,
               "Content-Type": "application/json", // Content-Type của body là JSON
