@@ -370,6 +370,7 @@ export default {
       noiDangKyJson: noiDangKyJson,
       donViNop: "",
       noiDangKy: "",
+      ltRequest: {},
     };
   },
   methods: {
@@ -413,6 +414,39 @@ export default {
           console.error("Thông báo lỗi:", error.message);
         }
         console.error("Cấu hình lỗi:", error.config);
+      }
+    },
+
+    async getLTRequest() {
+      const maHsoTrimmed = this.maHso.trim().replace(/\s+/g, "");
+      const getLTRequestURL = `https://apiigate.gialai.gov.vn/pa/judicial-civil-status/--send?code=${maHsoTrimmed}&showIntputSendEnable=true`;
+
+      try {
+        const dataLT = await axios.post(
+          getLTRequestURL,
+          {},
+          {
+            headers: {
+              Authorization: `Bearer ${this.igateToken}`, // Đính kèm token vào header
+            },
+          }
+        );
+        console.log("content LT:", dataLT);
+        this.ltRequest = dataLT.data.input;
+        this.requestBodyString = JSON.stringify(this.ltRequest, null, 2);
+      } catch (error) {
+        this.loading = false;
+        this.isSuccess = false;
+        this.notificationMessage = "Get thông tin hồ sơ không thành công";
+        this.showError();
+        if (error.response) {
+          console.error("Dữ liệu phản hồi lỗi:", error.response.data);
+          console.error("Trạng thái phản hồi lỗi:", error.response.status);
+        } else if (error.request) {
+          console.error("Yêu cầu lỗi:", error.request);
+        } else {
+          console.error("Thông báo lỗi:", error.message);
+        }
       }
     },
 
@@ -507,23 +541,6 @@ export default {
         });
         // Lưu dữ liệu vào biến data
         console.log("Data:", response.data);
-        this.requestBody.maDonVi = response.data.eForm.data.noiDangKy;
-        const date = new Date(response.data.acceptedDate);
-        const year = date.getFullYear();
-        const month = String(date.getMonth() + 1).padStart(2, "0"); // Tháng bắt đầu từ 0, cộng 1 để có tháng chính xác
-        const day = String(date.getDate()).padStart(2, "0");
-
-        this.requestBody.ngayTiepNhan = `${year}-${month}-${day}`;
-        this.requestBody.module = response.data.eForm.data.loaiHTTP;
-        this.requestBody.maHoSo = response.data.code;
-        this.eformData = response.data.eForm.data;
-        let innerXML = jsonToXml(this.eformData);
-        this.requestBody.data = `<hotich><hoso>${innerXML}</hoso></hotich>`;
-        this.responseHT = "";
-        this.requestBodyString = JSON.stringify(this.requestBody, null, 2);
-        this.isSuccess = true;
-        this.notificationMessage = "Get thông tin hồ sơ thành công";
-
         let agency = response.data.agency.code;
         if (agency) {
           let dvi = this.dViData.content.find((room) => room.code === agency);
@@ -536,7 +553,32 @@ export default {
           this.noiDangKy = noiDangKyName.tenDonViHanhChinh;
         }
 
-        this.showError();
+        if (
+          response.data.eForm.data.loaiHTTP == "LTKS" ||
+          response.data.eForm.data.loaiHTTP == "LTKT"
+        ) {
+          await this.getLTRequest();
+          this.isSuccess = true;
+          this.notificationMessage = "Get thông tin hồ sơ thành công";
+        } else {
+          this.requestBody.maDonVi = response.data.eForm.data.noiDangKy;
+          const date = new Date(response.data.acceptedDate);
+          const year = date.getFullYear();
+          const month = String(date.getMonth() + 1).padStart(2, "0"); // Tháng bắt đầu từ 0, cộng 1 để có tháng chính xác
+          const day = String(date.getDate()).padStart(2, "0");
+
+          this.requestBody.ngayTiepNhan = `${year}-${month}-${day}`;
+          this.requestBody.module = response.data.eForm.data.loaiHTTP;
+          this.requestBody.maHoSo = response.data.code;
+          this.eformData = response.data.eForm.data;
+          let innerXML = jsonToXml(this.eformData);
+          this.requestBody.data = `<hotich><hoso>${innerXML}</hoso></hotich>`;
+          this.responseHT = "";
+          this.requestBodyString = JSON.stringify(this.requestBody, null, 2);
+          this.isSuccess = true;
+          this.notificationMessage = "Get thông tin hồ sơ thành công";
+          this.showError();
+        }
       } catch (error) {
         this.isSuccess = false;
         this.notificationMessage = "Get thông tin hồ sơ không thành công";
@@ -570,9 +612,17 @@ export default {
         this.isSuccess = false;
         this.showError();
       } else {
-        const url =
+        var url =
           "https://congdichvu.gialai.gov.vn:443/hotich/1.0/dangKyHoTich";
         this.requestBody = JSON.parse(this.requestBodyString); // Chuyển requestBodyString về dạng object
+
+        if (
+          this.requestBody.module == "LTKS" ||
+          this.requestBody.module == "LTKT"
+        ) {
+          url =
+            "https://congdichvu.gialai.gov.vn:443/apiLienThongKSKT/1.0/nhanHoSoDKHT";
+        }
         console.log(this.requestBody);
         try {
           const response = await axios.post(url, this.requestBody, {
