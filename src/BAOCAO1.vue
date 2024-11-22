@@ -371,6 +371,7 @@ export default {
       donViNop: "",
       noiDangKy: "",
       ltRequest: {},
+      isDVCLT: false,
     };
   },
   methods: {
@@ -462,6 +463,45 @@ export default {
         });
         console.log("content:", getHsId);
         this.hsoId = getHsId.data.content[0].id;
+        this.isDVCLT = getHsId.data.content[0].isDVCLT;
+        let agency = getHsId.data.content[0].agency.code;
+        if (agency) {
+          let dvi = this.dViData.content.find((room) => room.code === agency);
+          this.donViNop = dvi.name;
+
+          var maNoiDangKy = getHsId.data.content[0].eForm.data.noiDangKy;
+          let noiDangKyName = this.noiDangKyJson.find(
+            (data) => data.maDonViHanhChinh === maNoiDangKy
+          );
+          this.noiDangKy = noiDangKyName.tenDonViHanhChinh;
+        }
+        if (
+          getHsId.data.content[0].eForm.data.loaiHTTP == "LTKS" ||
+          getHsId.data.content[0].eForm.data.loaiHTTP == "LTKT"
+        ) {
+          await this.getLTRequest();
+          this.isSuccess = true;
+          this.notificationMessage = "Get thông tin hồ sơ thành công";
+        } else {
+          this.isSuccess = true;
+          this.notificationMessage = "Get thông tin hồ sơ thành công";
+          this.showError();
+          this.requestBody.maDonVi =
+            getHsId.data.content[0].eForm.data.noiDangKy;
+          const date = new Date(getHsId.data.content[0].acceptedDate);
+          const year = date.getFullYear();
+          const month = String(date.getMonth() + 1).padStart(2, "0"); // Tháng bắt đầu từ 0, cộng 1 để có tháng chính xác
+          const day = String(date.getDate()).padStart(2, "0");
+
+          this.requestBody.ngayTiepNhan = `${year}-${month}-${day}`;
+          this.requestBody.module = getHsId.data.content[0].eForm.data.loaiHTTP;
+          this.requestBody.maHoSo = getHsId.data.content[0].code;
+          this.eformData = getHsId.data.content[0].eForm.data;
+          let innerXML = jsonToXml(this.eformData);
+          this.requestBody.data = `<hotich><hoso>${innerXML}</hoso></hotich>`;
+          this.responseHT = "";
+          this.requestBodyString = JSON.stringify(this.requestBody, null, 2);
+        }
       } catch (error) {
         this.loading = false;
         this.isSuccess = false;
@@ -475,6 +515,9 @@ export default {
         } else {
           console.error("Thông báo lỗi:", error.message);
         }
+      } finally {
+        this.loading = false; // Kết thúc hiển thị loader
+        this.showError();
       }
     },
 
@@ -532,7 +575,6 @@ export default {
 
     async getData() {
       const url = `https://apiigate.gialai.gov.vn/pa/dossier/${this.hsoId}/--online`;
-
       try {
         const response = await axios.get(url, {
           headers: {
@@ -541,17 +583,6 @@ export default {
         });
         // Lưu dữ liệu vào biến data
         console.log("Data:", response.data);
-        let agency = response.data.agency.code;
-        if (agency) {
-          let dvi = this.dViData.content.find((room) => room.code === agency);
-          this.donViNop = dvi.name;
-
-          var maNoiDangKy = response.data.eForm.data.noiDangKy;
-          let noiDangKyName = this.noiDangKyJson.find(
-            (data) => data.maDonViHanhChinh === maNoiDangKy
-          );
-          this.noiDangKy = noiDangKyName.tenDonViHanhChinh;
-        }
 
         if (
           response.data.eForm.data.loaiHTTP == "LTKS" ||
@@ -599,9 +630,9 @@ export default {
     async fetchData() {
       this.loading = true;
       await this.getHsoId();
-      if (this.hsoId) {
-        await this.getData();
-      }
+      // if (this.hsoId) {
+      //   await this.getData();
+      // }
     },
 
     async pushHoTich() {
