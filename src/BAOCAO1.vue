@@ -454,7 +454,7 @@ export default {
     async getHsoId() {
       const maHsoTrimmed = this.maHso.trim().replace(/\s+/g, "");
       const getHsoIdUrl = `https://apiigate.gialai.gov.vn/pa/dossier/search?page=0&size=20&applicant-organization=&spec=slice&code=${maHsoTrimmed}`;
-
+      this.requestBodyString = "";
       try {
         const getHsId = await axios.get(getHsoIdUrl, {
           headers: {
