@@ -645,18 +645,15 @@ export default {
       } else {
         var url =
           "https://congdichvu.gialai.gov.vn:443/hotich/1.0/dangKyHoTich";
-        this.requestBody = JSON.parse(this.requestBodyString); // Chuyển requestBodyString về dạng object
+        var bodySend = JSON.parse(this.requestBodyString); // Chuyển requestBodyString về dạng object
 
-        if (
-          this.requestBody.module == "LTKS" ||
-          this.requestBody.module == "LTKT"
-        ) {
+        if (bodySend.module == "LTKS" || bodySend.module == "LTKT") {
           url =
             "https://congdichvu.gialai.gov.vn:443/apiLienThongKSKT/1.0/nhanHoSoDKHT";
         }
-        console.log(this.requestBody);
+        console.log(bodySend);
         try {
-          const response = await axios.post(url, this.requestBody, {
+          const response = await axios.post(url, bodySend, {
             headers: {
               Authorization: `Bearer ${this.token}`,
               "Content-Type": "application/json", // Content-Type của body là JSON
