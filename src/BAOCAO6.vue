@@ -309,8 +309,34 @@ export default {
         }
       }
     },
-    handleButtonClick(item) {
-      alert(item);
+    async handleButtonClick(item) {
+      console.log(item);
+      const dayLaiUrl = `https://dvcapi.daklak.gov.vn/ad/api/lienthongDVCLT/capNhatTrangThaiHoSoDVCLTHoTich`;
+      try {
+        const response = await axios.post(dayLaiUrl, item.requestBody, {
+          headers: {
+            Authorization: `Bearer ${this.igateToken}`, // Đính kèm token vào header
+          },
+        });
+        if (response) {
+          console.log(response.data);
+          if (response.data.status == 200) {
+            alert(response.data.title);
+          } else {
+            alert(response.data.errors.soHoSoLT[0]);
+          }
+        }
+      } catch (error) {
+        alert(error);
+        if (error.response) {
+          console.error("Dữ liệu phản hồi lỗi:", error.response.data);
+          console.error("Trạng thái phản hồi lỗi:", error.response.status);
+        } else if (error.request) {
+          console.error("Yêu cầu lỗi:", error.request);
+        } else {
+          console.error("Thông báo lỗi:", error.message);
+        }
+      }
     },
 
     async getKetQua() {

@@ -1,69 +1,200 @@
 <template>
-  <div class="coordinate-converter">
-    <h2>Chuyển đổi tọa độ WGS84 sang VN2000 (Gia Lai)</h2>
-    <div>
-      <label for="latitude">Vĩ độ (WGS84):</label>
-      <input
-        type="number"
-        v-model="latitude"
-        id="latitude"
-        placeholder="Nhập vĩ độ WGS84"
-      />
-    </div>
-    <div>
-      <label for="longitude">Kinh độ (WGS84):</label>
-      <input
-        type="number"
-        v-model="longitude"
-        id="longitude"
-        placeholder="Nhập kinh độ WGS84"
-      />
-    </div>
-    <button @click="convertCoordinates">Chuyển đổi</button>
-
-    <div v-if="convertedCoordinates">
-      <h3>Kết quả (VN2000 - Gia Lai):</h3>
-      <p>X: {{ convertedCoordinates[0] }}</p>
-      <p>Y: {{ convertedCoordinates[1] }}</p>
-    </div>
-  </div>
+  <v-app>
+    <v-container>
+      <v-row>
+        <v-col>
+          <v-textarea label="Token" v-model="igateToken" outlined></v-textarea>
+        </v-col>
+      </v-row>
+      <v-row>
+        <v-col>
+          <v-text-field
+            label="Mã đơn vị cha"
+            v-model="maDonvi"
+            outlined
+          ></v-text-field>
+        </v-col>
+        <v-col>
+          <v-btn
+            @click="getDanhSachTK"
+            style="
+              color: white;
+              font-weight: bold;
+              width: auto;
+              padding: 10px;
+              margin: 10px 10px;
+              border: 1px solid #bbbbbb !important;
+              border-radius: 4px;
+              box-sizing: border-box;
+              font-size: 16px;
+              background-color: rgb(38, 113, 184) !important;
+            "
+            >Get list Id</v-btn
+          >
+          <v-btn
+            @click="deleteUser"
+            style="
+              color: white;
+              font-weight: bold;
+              width: auto;
+              padding: 10px;
+              margin: 10px 10px;
+              border: 1px solid #bbbbbb !important;
+              border-radius: 4px;
+              box-sizing: border-box;
+              font-size: 16px;
+              background-color: rgb(38, 113, 184) !important;
+            "
+            >xÓA Id</v-btn
+          >
+          <v-btn
+            @click="taoUser2"
+            style="
+              color: white;
+              font-weight: bold;
+              width: auto;
+              padding: 10px;
+              margin: 10px 10px;
+              border: 1px solid #bbbbbb !important;
+              border-radius: 4px;
+              box-sizing: border-box;
+              font-size: 16px;
+              background-color: rgb(38, 113, 184) !important;
+            "
+            >Tạo user</v-btn
+          >
+          <v-btn
+            @click="taoUser"
+            style="
+              color: white;
+              font-weight: bold;
+              width: auto;
+              padding: 10px;
+              margin: 10px 10px;
+              border: 1px solid #bbbbbb !important;
+              border-radius: 4px;
+              box-sizing: border-box;
+              font-size: 16px;
+              background-color: rgb(38, 113, 184) !important;
+            "
+            >Tạo user</v-btn
+          >
+        </v-col>
+        <v-col>
+          <span>ids: {{ listDonviCon }}</span>
+        </v-col>
+      </v-row>
+    </v-container>
+  </v-app>
 </template>
 
 <script>
-import proj4 from "proj4";
-
+import axios from "axios";
+import dtiDonvi from "./dtiDonvi.json";
 export default {
   name: "CoordinateConverter",
   data() {
     return {
-      latitude: null,
-      longitude: null,
-      convertedCoordinates: null,
+      igateToken: "",
+      maDonvi: "",
+      listDonviCon: [],
+      listAdd: [],
+      dtiDonviJson: dtiDonvi,
     };
   },
   methods: {
-    convertCoordinates() {
-      // Kiểm tra nếu latitude và longitude có giá trị hợp lệ
-      if (
-        this.latitude === null ||
-        this.longitude === null ||
-        isNaN(this.latitude) ||
-        isNaN(this.longitude)
-      ) {
-        alert("Vui lòng nhập giá trị số hợp lệ cho cả vĩ độ và kinh độ.");
-        return;
+    async getDanhSachTK() {
+      console.log("vo day");
+      this.listDonviCon = [];
+      const getHsoIdUrl = `https://dti.gialai.gov.vn/ws/api/nhan_vien/get_list?id=${this.maDonvi}`;
+
+      try {
+        const getHsIdRes = await axios.get(getHsoIdUrl, {
+          headers: {
+            Authorization: `Bearer ${this.igateToken}`,
+          },
+        });
+        console.log("getHsIdRes:", getHsIdRes);
+        getHsIdRes.data.forEach((element) => {
+          this.listDonviCon.push(element.Id);
+        });
+        console.log("listDonviCon:", this.listDonviCon);
+      } catch (error) {
+        console.log("error:", error);
       }
+    },
 
-      // Định nghĩa hệ tọa độ WGS84 và VN2000 (Gia Lai)
-      const WGS84 = "+proj=longlat +datum=WGS84 +no_defs";
-      const VN2000_GiaLai =
-        "+proj=tmerc +lat_0=0 +lon_0=108.25 +k=0.9999 +x_0=500000 +y_0=0 +datum=WGS84 +units=m +no_defs";
+    async deleteUser() {
+      for (let user of this.listDonviCon) {
+        const response = await axios.post(
+          "https://dti.gialai.gov.vn/ws/api/nhan_vien/delete",
+          {
+            Id: user,
+          },
+          {
+            headers: {
+              Authorization: `Bearer ${this.igateToken}`, // Đính kèm token vào header
+            },
+          }
+        );
+        console.log(response);
+      }
+    },
+    removeVietnameseTones(str) {
+      return str
+        .normalize("NFD") // Tách các ký tự gốc và dấu
+        .replace(/[\u0300-\u036f]/g, "") // Loại bỏ dấu
+        .replace(/đ/g, "d") // Chuyển đ thành d
+        .replace(/Đ/g, "D"); // Chuyển Đ thành D
+    },
 
-      // Thực hiện chuyển đổi
-      this.convertedCoordinates = proj4(WGS84, VN2000_GiaLai, [
-        parseFloat(this.longitude),
-        parseFloat(this.latitude),
-      ]);
+    formatString(input) {
+      return this.removeVietnameseTones(input)
+        .toLowerCase() // Chuyển tất cả chữ sang chữ thường
+        .replace(/[^a-z0-9\s]/g, "") // Loại bỏ các ký tự đặc biệt
+        .replace(/\s+/g, ""); // Xóa khoảng trắng
+    },
+
+    taoUser2() {
+      console.log(this.dtiDonviJson);
+      this.listAdd = [];
+      this.dtiDonviJson.forEach((item) => {
+        if (item.IdCha == this.maDonvi) {
+          this.listAdd.push({
+            Id: item.Id,
+            HoTen: item.Ten,
+            TaiKhoan: this.formatString(item.Ten),
+            DienThoai: "",
+            MatKhau: "Vnpt@123",
+            IdCoQuan: item.Id,
+            DsIdNhomQuyen: ["5"],
+          });
+        }
+        console.log("item", this.listAdd);
+      });
+    },
+    async taoUser() {
+      for (let user of this.listAdd) {
+        console.log("user:", user);
+        const response = await axios.post(
+          "https://dti.gialai.gov.vn/ws/api/nhan_vien/create",
+          {
+            Id: 0,
+            HoTen: user.HoTen,
+            TaiKhoan: user.TaiKhoan,
+            DienThoai: "",
+            MatKhau: "Vnpt@123",
+            IdCoQuan: user.Id,
+            DsIdNhomQuyen: ["5"],
+          },
+          {
+            headers: {
+              Authorization: `Bearer ${this.igateToken}`, // Đính kèm token vào header
+            },
+          }
+        );
+        console.log(response);
+      }
     },
   },
 };

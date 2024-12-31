@@ -181,13 +181,14 @@ export default {
       apDungDonViReq: {
         processingTime: "",
         processingTimeUnit: "d",
+        //iD eform
         applicantEForm: {
           id: "6652e73bd4696e0018acefa4",
           name: "HCC-GLI-VBDLIS",
         },
         eForm: null,
         reportTemplate: [],
-
+        //iD thời gian làm việc
         timesheet: {
           id: "6604f6d5c21257111af17280",
           name: "Thời gian làm việc hành chính GLI (không được xóa)",

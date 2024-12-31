@@ -26,6 +26,7 @@ import BAOCAO3 from "./BAOCAO3";
 import BAOCAO4 from "./BAOCAO4";
 import BAOCAO5 from "./BAOCAO5";
 import BAOCAO6 from "./BAOCAO6";
+// import BAOCAO7 from "./BAOCAO7";
 export default {
   components: {
     BAOCAO1,
@@ -34,6 +35,7 @@ export default {
     BAOCAO4,
     BAOCAO5,
     BAOCAO6,
+    // BAOCAO7,
   },
   data() {
     return {
@@ -46,6 +48,7 @@ export default {
         { tab: "Clone quy trình DD", content: "BAOCAO4" },
         { tab: "Clone xã", content: "BAOCAO5" },
         { tab: "DVCLT", content: "BAOCAO6" },
+        // { tab: "DTI", content: "BAOCAO7" },
       ],
     };
   },
