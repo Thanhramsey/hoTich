@@ -123,7 +123,15 @@
             no-data-text="Không có log"
           >
             <template v-slot:item.requestBody="{ item }">
-              <pre>{{ item.requestBody }}</pre>
+              <pre
+                style="
+                  max-width: 500px;
+                  overflow: hidden;
+                  text-overflow: ellipsis;
+                "
+              >
+                {{ item.requestBody }}
+              </pre>
             </template>
             <template v-slot:item.responseBody="{ item }">
               <pre>{{ item.responseBody }}</pre>
@@ -311,7 +319,7 @@ export default {
     },
     async handleButtonClick(item) {
       console.log(item);
-      const dayLaiUrl = `https://dvcapi.daklak.gov.vn/ad/api/lienthongDVCLT/capNhatTrangThaiHoSoDVCLTHoTich`;
+      const dayLaiUrl = `https://apiigate.gialai.gov.vn/ad/api/lienthongDVCLT/capNhatTrangThaiHoSoDVCLTHoTich`;
       try {
         const response = await axios.post(dayLaiUrl, item.requestBody, {
           headers: {
@@ -379,6 +387,12 @@ input {
   border-radius: 4px;
   box-sizing: border-box;
   font-size: 16px;
+}
+.response-column {
+  max-width: 300px; /* Đặt độ rộng tối đa */
+  white-space: nowrap; /* Không cho phép xuống dòng */
+  overflow: hidden; /* Ẩn phần vượt quá */
+  text-overflow: ellipsis; /* Hiển thị dấu "..." khi nội dung vượt quá */
 }
 
 button {
