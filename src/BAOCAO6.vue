@@ -274,6 +274,8 @@ export default {
 
     async getTTHosO() {
       const maHsoTrimmed = this.maHso.trim().replace(/\s+/g, "");
+      this.data = [];
+
       const getHsoIdUrl = `https://apiigate.gialai.gov.vn/ad/api/lienthongDVCLT/getLog?nationCode=${maHsoTrimmed}`;
 
       try {
@@ -285,21 +287,32 @@ export default {
         if (response.data && response.data.content.length > 0) {
           response.data.content.forEach((element) => {
             if (element.requestBody.trangThai) {
-              this.data.push(element);
-              if (this.module == "") {
-                if (
-                  element.requestBody.maTTHC == "2.000986" ||
-                  element.requestBody.maTTHC == "2.001023"
-                ) {
-                  this.module = "LTKS";
-                } else if (element.requestBody.maTTHC == "1.011733") {
-                  this.module = "LTKT";
+              // Check if element already exists based on trangThai and responseBody.status
+              const exists = this.data.some(
+                (item) =>
+                  item.requestBody.trangThai ===
+                    element.requestBody.trangThai &&
+                  item.responseBody.status === element.responseBody.status
+              );
+
+              if (!exists) {
+                this.data.push(element);
+                if (this.module == "") {
+                  if (
+                    element.requestBody.maTTHC == "2.000986" ||
+                    element.requestBody.maTTHC == "2.001023"
+                  ) {
+                    this.module = "LTKS";
+                  } else if (element.requestBody.maTTHC == "1.011733") {
+                    this.module = "LTKT";
+                  }
                 }
+                this.maHso2 = element.requestBody.maHoSo;
               }
-              this.maHso2 = element.requestBody.maHoSo;
             }
           });
         }
+
         this.data.sort(
           (a, b) => a.requestBody.trangThai - b.requestBody.trangThai
         );
