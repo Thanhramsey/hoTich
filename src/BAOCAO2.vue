@@ -2,6 +2,27 @@
   <div>
     <v-container>
       <!-- File Upload -->
+      <div>
+        <label for="igateToken" style="font-size: large; font-weight: bold"
+          >igateToken:</label
+        >
+        <v-icon class="ml-2 cursor-pointer round-icon">
+          mdi-information-outline
+        </v-icon>
+        <textarea
+          class="textarea"
+          type="text"
+          id="igateToken"
+          v-model="igateToken"
+          required
+          style="
+            width: 100%;
+            height: 100px;
+            box-sizing: border-box;
+            border: 1px solid #bbbbbb !important;
+          "
+        ></textarea>
+      </div>
       <v-file-input
         label="Upload Excel File"
         accept=".xlsx, .xls"
@@ -18,7 +39,23 @@
       ></v-progress-linear>
 
       <!-- Process Button -->
-      <v-btn @click="processFile"> Process Addresses </v-btn>
+      <v-btn
+        @click="processFile"
+        style="
+          color: white;
+          font-weight: bold;
+          width: 250px;
+          padding: 10px;
+          margin: 10px 0;
+          border: 1px solid #bbbbbb !important;
+          border-radius: 4px;
+          box-sizing: border-box;
+          font-size: 16px;
+          background-color: rgb(38, 113, 184) !important;
+        "
+      >
+        Process Hồ sơ
+      </v-btn>
 
       <!-- Processed Addresses Table -->
       <v-data-table
@@ -28,10 +65,7 @@
         class="mt-4"
       >
         <template v-slot:item.coordinates="{ item }">
-          <span v-if="item.coordinates.lat">
-            {{ item.coordinates.lat }}, {{ item.coordinates.lon }}
-          </span>
-          <span v-else>{{ item.coordinates }}</span>
+          <span>{{ item.coordinates }}</span>
         </template>
       </v-data-table>
     </v-container>
@@ -50,9 +84,11 @@ export default {
       processedAddresses: [], // Array to hold the processed addresses with coordinates
       progress: 0, // To track the progress percentage
       totalAddresses: 0, // Total number of addresses to process
+      hsoId: "",
+      igateToken: "",
       headers: [
-        { text: "Address", value: "address" },
-        { text: "Coordinates", value: "coordinates" },
+        { text: "Mã hồ sơ", value: "address" },
+        { text: "Trạng thái xử lý", value: "coordinates" },
       ],
     };
   },
@@ -75,10 +111,10 @@ export default {
 
         json.forEach((row, index) => {
           if (index > 0) {
-            let simAddress = this.simplifyAddress(row[1]);
-            this.addresses.push(simAddress); // Assuming column 2 is the address
+            this.addresses.push(row[1]); // Assuming column 2 is the address
           }
         });
+        console.log("this.addresses:", this.addresses);
 
         this.totalAddresses = this.addresses.length;
         await this.processAddresses();
@@ -90,7 +126,7 @@ export default {
     async processAddresses() {
       for (let i = 0; i < this.addresses.length; i++) {
         const address = this.addresses[i];
-        const coordinates = await this.getCoordinates(address);
+        const coordinates = await this.endHoSo(address);
         this.processedAddresses.push({
           address,
           coordinates,
@@ -101,6 +137,72 @@ export default {
       }
 
       this.downloadProcessedFile(); // Call method to download the file
+    },
+
+    async endHoSo(id) {
+      try {
+        const hsoId = await this.getHsoId(id);
+        if (!hsoId) return "Không tìm thấy hồ sơ nào.";
+
+        const result = await this.endProcess(hsoId, id);
+        return result ? "Thành công" : "Thất bại";
+      } catch (error) {
+        console.error("Lỗi khi kết thúc hồ sơ:", error);
+        return "Thất bại";
+      }
+    },
+
+    async getHsoId(id) {
+      const trimmedId = id.trim().replace(/\s+/g, "");
+      const url = `https://apiigate.gialai.gov.vn/pa/dossier/search?page=0&size=1&applicant-organization=&spec=slice&code=${trimmedId}`;
+
+      try {
+        const response = await axios.get(url, {
+          headers: {
+            Authorization: `Bearer ${this.igateToken}`,
+          },
+        });
+        const content = response.data.content;
+        if (content && content.length > 0) {
+          return content[0].id; // Trả về `hsoId`
+        }
+        console.warn("Không tìm thấy hồ sơ nào.");
+        return null;
+      } catch (error) {
+        console.error(
+          "Lỗi khi lấy dữ liệu hồ sơ:",
+          error.response?.data || error.message
+        );
+        return null;
+      }
+    },
+
+    async endProcess(hsoId, code) {
+      // const url =
+      //   "https://apiigate.gialai.gov.vn/pa/dossier/--force-end-process";
+      const requestBody = [
+        {
+          id: hsoId,
+          code: code.trim(),
+        },
+      ];
+
+      try {
+        // const response = await axios.put(url, requestBody, {
+        //   headers: {
+        //     Authorization: `Bearer ${this.igateToken}`,
+        //     "Content-Type": "application/json",
+        //   },
+        // });
+        console.log("Kết thúc thành công:", requestBody.data);
+        return true;
+      } catch (error) {
+        console.error(
+          "Lỗi khi kết thúc hồ sơ:",
+          error.response?.data || error.message
+        );
+        return false;
+      }
     },
 
     async getCoordinates(address) {
@@ -182,13 +284,11 @@ export default {
 
     downloadProcessedFile() {
       const wsData = [
-        ["STT", "Địa chỉ", "Tọa độ"],
+        ["STT", "Mã hồ sơ", "Trạng thái"],
         ...this.processedAddresses.map((item, index) => [
           index + 1,
           item.address,
-          item.coordinates.lat
-            ? `${item.coordinates.lat}, ${item.coordinates.lon}`
-            : item.coordinates,
+          item.coordinates,
         ]),
       ];
 
