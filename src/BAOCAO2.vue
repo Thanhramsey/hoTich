@@ -178,8 +178,8 @@ export default {
     },
 
     async endProcess(hsoId, code) {
-      // const url =
-      //   "https://apiigate.gialai.gov.vn/pa/dossier/--force-end-process";
+      const url =
+        "https://apiigate.gialai.gov.vn/pa/dossier/--force-end-process";
       const requestBody = [
         {
           id: hsoId,
@@ -188,13 +188,13 @@ export default {
       ];
 
       try {
-        // const response = await axios.put(url, requestBody, {
-        //   headers: {
-        //     Authorization: `Bearer ${this.igateToken}`,
-        //     "Content-Type": "application/json",
-        //   },
-        // });
-        console.log("Kết thúc thành công:", requestBody.data);
+        const response = await axios.put(url, requestBody, {
+          headers: {
+            Authorization: `Bearer ${this.igateToken}`,
+            "Content-Type": "application/json",
+          },
+        });
+        console.log("Kết thúc thành công:", response.data);
         return true;
       } catch (error) {
         console.error(
