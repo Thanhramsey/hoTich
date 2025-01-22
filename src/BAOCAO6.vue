@@ -15,19 +15,20 @@
           <v-col>
             <!-- Textfield nhập processId -->
             <v-text-field
-              label="Mã Hồ sơ Liên Thông"
-              v-model="maHso"
+              label="Mã Hồ sơ"
+              v-model="maHso2"
               outlined
             ></v-text-field>
           </v-col>
           <v-col>
             <!-- Textfield nhập processId -->
             <v-text-field
-              label="Mã Hồ sơ"
-              v-model="maHso2"
+              label="Mã Hồ sơ Liên Thông"
+              v-model="maHso"
               outlined
             ></v-text-field>
           </v-col>
+
           <v-col>
             <span>Module: {{ module }}</span>
           </v-col>

@@ -66,121 +66,154 @@
         <section>
           <section class="mb-5">
             <h2 class="mb-5">Get TT Hồ sơ</h2>
-            <div>
-              <label
-                for="igateToken"
-                style="font-size: large; font-weight: bold"
-                >gliToken:</label
-              >
-              <v-icon
-                class="ml-2 cursor-pointer round-icon"
-                @click="showImage('images/image2.png')"
-                :style="iconStyle"
-              >
-                mdi-information-outline
-              </v-icon>
-              <textarea
-                class="textarea"
-                type="text"
-                id="igateToken"
-                v-model="token"
-                required
-                style="
-                  width: 100%;
-                  height: 100px;
-                  box-sizing: border-box;
-                  border: 1px solid #bbbbbb !important;
-                "
-              ></textarea>
-            </div>
-            <div>
-              <div class="d-flex align-center">
-                <label
-                  for="igateToken"
-                  style="font-size: large; font-weight: bold"
-                >
-                  igateToken:
-                </label>
-                <v-icon
-                  class="ml-2 cursor-pointer round-icon"
-                  @click="showImage('images/image.png')"
-                  :style="iconStyle"
-                >
-                  mdi-information-outline
-                </v-icon>
-              </div>
-              <!-- Dialog -->
-              <v-dialog
-                v-model="dialog"
-                class="custom-dialog"
-                persistent
-                max-width="90%"
-                :style="imageStyle"
-              >
-                <v-card>
-                  <v-card-title class="headline" style="margin-bottom: 20px"
-                    >Lấy token Igate<v-icon
-                      :style="closeIconStyle"
-                      @click="dialog = false"
-                    >
-                      mdi-close
-                    </v-icon></v-card-title
+            <v-row>
+              <v-col>
+                <div>
+                  <label
+                    for="igateToken"
+                    style="font-size: large; font-weight: bold"
+                    >gliToken:</label
                   >
-                  <v-card-text>
-                    <v-img :src="currentImage" alt="Description" />
-                  </v-card-text>
-                  <v-card-actions>
-                    <v-spacer></v-spacer>
-                    <v-btn text @click="dialog = false">Đóng</v-btn>
-                  </v-card-actions>
-                </v-card>
-              </v-dialog>
+                  <v-icon
+                    class="ml-2 cursor-pointer round-icon"
+                    @click="showImage('images/image2.png')"
+                    :style="iconStyle"
+                  >
+                    mdi-information-outline
+                  </v-icon>
+                  <textarea
+                    class="textarea"
+                    type="text"
+                    id="igateToken"
+                    v-model="token"
+                    required
+                    style="
+                      width: 100%;
+                      height: 100px;
+                      box-sizing: border-box;
+                      border: 1px solid #bbbbbb !important;
+                    "
+                  ></textarea>
+                </div>
+              </v-col>
+              <v-col
+                ><div>
+                  <div class="d-flex align-center">
+                    <label
+                      for="igateToken"
+                      style="font-size: large; font-weight: bold"
+                    >
+                      igateToken:
+                    </label>
+                    <v-icon
+                      class="ml-2 cursor-pointer round-icon"
+                      @click="showImage('images/image.png')"
+                      :style="iconStyle"
+                    >
+                      mdi-information-outline
+                    </v-icon>
+                  </div>
+                  <!-- Dialog -->
+                  <v-dialog
+                    v-model="dialog"
+                    class="custom-dialog"
+                    persistent
+                    max-width="90%"
+                    :style="imageStyle"
+                  >
+                    <v-card>
+                      <v-card-title class="headline" style="margin-bottom: 20px"
+                        >Lấy token Igate<v-icon
+                          :style="closeIconStyle"
+                          @click="dialog = false"
+                        >
+                          mdi-close
+                        </v-icon></v-card-title
+                      >
+                      <v-card-text>
+                        <v-img :src="currentImage" alt="Description" />
+                      </v-card-text>
+                      <v-card-actions>
+                        <v-spacer></v-spacer>
+                        <v-btn text @click="dialog = false">Đóng</v-btn>
+                      </v-card-actions>
+                    </v-card>
+                  </v-dialog>
 
-              <v-dialog
-                v-model="notificationDialog"
-                max-width="700px"
-                persistent
+                  <v-dialog
+                    v-model="notificationDialog"
+                    max-width="700px"
+                    persistent
+                  >
+                    <v-card>
+                      <v-card-title class="headline">
+                        <span v-if="isSuccess">Success</span>
+                        <span v-else>Error</span>
+                      </v-card-title>
+                      <v-card-text>
+                        <v-alert
+                          :type="isSuccess ? 'success' : 'error'"
+                          border="left"
+                          colored-border
+                        >
+                          {{ notificationMessage }}
+                        </v-alert>
+                      </v-card-text>
+                      <v-card-actions>
+                        <v-spacer></v-spacer>
+                        <v-btn
+                          style="
+                            color: white;
+                            background-color: #1976d2 !important;
+                          "
+                          text
+                          @click="notificationDialog = false"
+                          >Close</v-btn
+                        >
+                      </v-card-actions>
+                    </v-card>
+                  </v-dialog>
+
+                  <textarea
+                    class="textarea"
+                    type="text"
+                    id="igateToken"
+                    v-model="igateToken"
+                    required
+                    style="
+                      width: 100%;
+                      height: 100px;
+                      box-sizing: border-box;
+                      border: 1px solid #bbbbbb !important;
+                    "
+                  ></textarea>
+                </div>
+              </v-col>
+              <v-col
+                cols="2"
+                class="d-flex flex-column align-center justify-center"
               >
-                <v-card>
-                  <v-card-title class="headline">
-                    <span v-if="isSuccess">Success</span>
-                    <span v-else>Error</span>
-                  </v-card-title>
-                  <v-card-text>
-                    <v-alert
-                      :type="isSuccess ? 'success' : 'error'"
-                      border="left"
-                      colored-border
-                    >
-                      {{ notificationMessage }}
-                    </v-alert>
-                  </v-card-text>
-                  <v-card-actions>
-                    <v-spacer></v-spacer>
-                    <v-btn
-                      style="color: white; background-color: #1976d2 !important"
-                      text
-                      @click="notificationDialog = false"
-                      >Close</v-btn
-                    >
-                  </v-card-actions>
-                </v-card>
-              </v-dialog>
+                <v-btn
+                  @click="getToken"
+                  :disabled="loading"
+                  variant="outlined"
+                  style="
+                    color: white;
+                    font-weight: bold;
+                    width: auto;
+                    padding: 20px;
+                    margin: 10px 0;
+                    border: 1px solid #bbbbbb !important;
+                    border-radius: 4px;
+                    box-sizing: border-box;
+                    font-size: 16px;
+                    background-color: #006400 !important;
+                  "
+                  >Lấy token</v-btn
+                >
+              </v-col>
+            </v-row>
 
-              <textarea
-                class="textarea"
-                type="text"
-                id="igateToken"
-                v-model="igateToken"
-                required
-                style="
-                  width: 100%;
-                  height: 100px;
-                  box-sizing: border-box;
-                  border: 1px solid #bbbbbb !important;
-                "
-              ></textarea>
-            </div>
             <div>
               <label for="maHso" style="font-size: large; font-weight: bold"
                 >Mã hồ sơ:</label
@@ -228,7 +261,7 @@
                 size="20"
                 class="ml-2"
               ></v-progress-circular>
-              Get TT Hồ sơ
+              Lấy dữ liệu hồ sơ
             </v-btn>
             <v-btn
               @click="endHoSo"
@@ -244,7 +277,7 @@
                 border-radius: 4px;
                 box-sizing: border-box;
                 font-size: 16px;
-                background-color: rgb(38, 113, 184) !important;
+                background-color: #ce7a58 !important;
               "
               >Kết thúc hồ sơ</v-btn
             >
@@ -384,26 +417,35 @@ export default {
       this.notificationDialog = true; // Mở dialog
     },
 
+    getB64Auth(user, password) {
+      const source = user + ":" + password;
+      const Authorization = "Basic " + Buffer.from(source).toString("base64");
+      return Authorization;
+    },
+
     async getToken() {
-      const tokenUrl = "/api/token"; // Sử dụng proxy
-      const authHeader = `Basic ${btoa(`${this.username}:${this.password}`)}`;
-
-      const data = new URLSearchParams();
-      data.append("grant_type", "client_credentials");
-
       try {
-        const response = await axios.post(tokenUrl, data, {
-          headers: {
-            Authorization: authHeader,
-            "Access-Control-Allow-Origin ": "*",
-            "Content-Type": "application/x-www-form-urlencoded",
-          },
-        });
+        const response = await axios.post(
+          "https://wsms.gialai.vnpt.vn/wsms/api/igate/login-congdvc-gli",
+          null,
+          {
+            headers: {},
+          }
+        );
         console.log("Token:", response.data);
         this.token = response.data.access_token;
+
+        const response2 = await axios.post(
+          "https://wsms.gialai.vnpt.vn/wsms/api/igate/login-igate",
+          null,
+          {
+            headers: {},
+          }
+        );
+        console.log("Token:", response2.data);
+        this.igateToken = response2.data.access_token;
       } catch (error) {
         if (error.response) {
-          // Máy chủ đã phản hồi với mã trạng thái nằm ngoài phạm vi 2xx
           console.error("Dữ liệu phản hồi lỗi:", error.response.data);
           console.error("Trạng thái phản hồi lỗi:", error.response.status);
           console.error("Header phản hồi lỗi:", error.response.headers);
@@ -414,7 +456,7 @@ export default {
           // Một lỗi đã xảy ra trong quá trình thiết lập yêu cầu
           console.error("Thông báo lỗi:", error.message);
         }
-        console.error("Cấu hình lỗi:", error.config);
+        console.error("Cấu hình lỗi:", error);
       }
     },
 

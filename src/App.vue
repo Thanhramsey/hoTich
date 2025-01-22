@@ -30,11 +30,11 @@ import BAOCAO6 from "./BAOCAO6";
 export default {
   components: {
     BAOCAO1,
+    BAOCAO6,
     BAOCAO2,
     BAOCAO3,
     BAOCAO4,
     BAOCAO5,
-    BAOCAO6,
     // BAOCAO7,
   },
   data() {
@@ -43,11 +43,11 @@ export default {
       tab: 0,
       items: [
         { tab: "Get Token", content: "BAOCAO1" },
+        { tab: "DVCLT", content: "BAOCAO6" },
         { tab: "Kết thúc hàng loạt", content: "BAOCAO2" },
         { tab: "Tạo object", content: "BAOCAO3" },
         { tab: "Clone quy trình DD", content: "BAOCAO4" },
         { tab: "Clone xã", content: "BAOCAO5" },
-        { tab: "DVCLT", content: "BAOCAO6" },
         // { tab: "DTI", content: "BAOCAO7" },
       ],
     };
