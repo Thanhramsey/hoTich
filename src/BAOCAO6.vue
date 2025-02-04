@@ -38,6 +38,22 @@
         <v-row>
           <v-col>
             <v-btn
+              @click="dialogLT = true"
+              style="
+                color: white;
+                font-weight: bold;
+                width: auto;
+                padding: 10px;
+                margin: 10px 10px;
+                border: 1px solid #bbbbbb !important;
+                border-radius: 4px;
+                box-sizing: border-box;
+                font-size: 16px;
+                background-color: rgb(38, 113, 184) !important;
+              "
+              >Tra cứu TTLT</v-btn
+            >
+            <v-btn
               @click="fetchData"
               style="
                 color: white;
@@ -188,12 +204,51 @@
               <v-textarea v-model="callAgainTextarea"> </v-textarea>
             </v-card-text>
             <v-card-actions>
-              <v-btn color="primary" @click="callAgainFunction()">
+              <v-btn
+                color="primary"
+                @click="callAgainFunction()"
+                style="
+                  color: white;
+                  font-weight: bold;
+                  width: auto;
+                  padding: 10px;
+                  margin: 10px 10px;
+                  border: 1px solid #bbbbbb !important;
+                  border-radius: 4px;
+                  box-sizing: border-box;
+                  font-size: 16px;
+                  background-color: rgb(38, 113, 184) !important;
+                "
+              >
                 Gọi lại
               </v-btn>
               <v-spacer></v-spacer>
               <v-btn text @click="dialog = false">Đóng</v-btn>
             </v-card-actions>
+          </v-card>
+        </v-dialog>
+
+        <v-dialog
+          v-model="dialogLT"
+          class="custom-dialog"
+          persistent
+          max-width="90%"
+          attach="#attach-dialog-bc6"
+        >
+          <v-card height="80vh">
+            <v-card-title class="headline" style="margin-bottom: 0px"
+              >Tra cứu trạng thái liên thông<v-icon
+                :style="closeIconStyle"
+                @click="dialogLT = false"
+              >
+                mdi-close
+              </v-icon></v-card-title
+            >
+            <iframe
+              src="https://lienthong.dichvucong.gov.vn/#/tra-cuu-ho-so"
+              style="width: 100%; height: 100%; border: none"
+            >
+            </iframe>
           </v-card>
         </v-dialog>
       </v-container>
@@ -249,6 +304,7 @@ export default {
       maHso2: "",
       module: "",
       dialog: false,
+      dialogLT: false,
       callAgainTextarea: "",
       tableHeaders: [
         { text: "Dossier Code", value: "dossierCode", align: "start" },
