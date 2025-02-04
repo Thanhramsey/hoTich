@@ -1,7 +1,12 @@
 <template>
   <div class="VueXlsx">
     <v-card height="100%" class="big-card">
-      <v-tabs v-model="tab" background-color="primary" dark>
+      <v-tabs
+        v-model="tab"
+        background-color="primary"
+        dark
+        direction="vertical"
+      >
         <v-tab v-for="item in items" :key="item.tab">
           {{ item.tab }}
         </v-tab>

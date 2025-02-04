@@ -67,7 +67,7 @@
           <section class="mb-5">
             <h2 class="mb-5">Get TT Hồ sơ</h2>
             <v-row>
-              <v-col>
+              <v-col cols="12" xs="12" md="5">
                 <div>
                   <label
                     for="igateToken"
@@ -76,15 +76,15 @@
                   >
                   <v-icon
                     class="ml-2 cursor-pointer round-icon"
-                    @click="showImage('images/image2.png')"
+                    @click="copyToClipboard(1)"
                     :style="iconStyle"
                   >
-                    mdi-information-outline
+                    mdi-content-copy
                   </v-icon>
                   <textarea
                     class="textarea"
                     type="text"
-                    id="igateToken"
+                    id="gliToken"
                     v-model="token"
                     required
                     style="
@@ -96,7 +96,7 @@
                   ></textarea>
                 </div>
               </v-col>
-              <v-col
+              <v-col cols="12" xs="12" md="5"
                 ><div>
                   <div class="d-flex align-center">
                     <label
@@ -107,10 +107,10 @@
                     </label>
                     <v-icon
                       class="ml-2 cursor-pointer round-icon"
-                      @click="showImage('images/image.png')"
+                      @click="copyToClipboard(2)"
                       :style="iconStyle"
                     >
-                      mdi-information-outline
+                      mdi-content-copy
                     </v-icon>
                   </div>
                   <!-- Dialog -->
@@ -190,8 +190,10 @@
                 </div>
               </v-col>
               <v-col
-                cols="2"
-                class="d-flex flex-column align-center justify-center"
+                cols="12"
+                md="2"
+                xs="12"
+                class="d-flex flex-column justify-center"
               >
                 <v-btn
                   @click="getToken"
@@ -408,6 +410,20 @@ export default {
     };
   },
   methods: {
+    copyToClipboard(type) {
+      var textarea = "";
+      if (type == 1) {
+        textarea = document.getElementById("gliToken");
+      } else {
+        textarea = document.getElementById("igateToken");
+      }
+
+      if (textarea) {
+        textarea.select();
+        document.execCommand("copy");
+      }
+    },
+
     showImage(image) {
       this.currentImage = image; // Cập nhật đường dẫn hình ảnh
       this.dialog = true; // Mở dialog

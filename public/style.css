@@ -4,11 +4,61 @@
   .mb-5 {
 	margin-bottom: 10px;
   }
+  .v-card__title.headline{
+	background-color: darkslategray;
+	color: white;
+  }
 
   .VueXlsx {
 	height: 100vh;
 	padding: 50px;
 	/* background-image: url('bg.jpg'); */
+  }
+  @media screen and (max-width: 768px) {
+	.VueXlsx {
+	  padding: 20px; /* Giảm padding cho mobile */
+	}
+	button{
+		font-size: 12px !important;
+	}
+  }
+  
+  @media screen and (max-width: 480px) {
+	.VueXlsx {
+	  padding: 10px; /* Giảm thêm padding cho màn hình nhỏ hơn */
+	}
+	button{
+		font-size: 12px !important;
+	}
+	.custom-align .v-data-table__mobile-row{
+		justify-content: flex-start !important;
+	}
+  }
+  
+/* Căn trái cho mọi cột */
+.custom-align .v-data-table__wrapper {
+	text-align: left !important;
+  }
+  
+  .v-data-table.custom-align
+	.v-data-table__mobile-row
+	.v-data-table__mobile-row__cell {
+	text-align: left !important;
+  }
+  
+  @media screen and (max-width: 600px) {
+	/* Bỏ override căn phải khi màn hình nhỏ */
+	.custom-align .v-data-table__wrapper {
+	  text-align: left !important;
+	}
+	.custom-align .v-data-table__mobile-row{
+		justify-content: flex-start !important;
+	}
+	.v-data-table.custom-align
+	  .v-data-table__mobile-row
+	  .v-data-table__mobile-row__cell {
+	  text-align: left !important;
+	}
   }
   .table {
 	border: 3px groove midnightblue;

@@ -12,7 +12,7 @@
           </v-col>
         </v-row>
         <v-row>
-          <v-col>
+          <v-col cols="12" md="5" xs="12">
             <!-- Textfield nhập processId -->
             <v-text-field
               label="Mã Hồ sơ"
@@ -20,7 +20,7 @@
               outlined
             ></v-text-field>
           </v-col>
-          <v-col>
+          <v-col cols="12" md="5" xs="12">
             <!-- Textfield nhập processId -->
             <v-text-field
               label="Mã Hồ sơ Liên Thông"
@@ -29,8 +29,10 @@
             ></v-text-field>
           </v-col>
 
-          <v-col>
-            <span>Module: {{ module }}</span>
+          <v-col cols="12" md="2" xs="12">
+            <span style="color: red; font-weight: bold"
+              >Module: {{ module }}</span
+            >
           </v-col>
         </v-row>
         <v-row>
@@ -98,7 +100,7 @@
           <v-col cols="2">
             <p>Trạng thái hiện tại : {{ trangThaiHienTai }}</p>
             <v-btn
-              @click="updateTrangThai"
+              @click="istrangThaiHoSoSuccess = false"
               style="
                 color: white;
                 font-weight: bold;
@@ -111,6 +113,23 @@
                 font-size: 16px;
                 background-color: rgb(38, 113, 184) !important;
               "
+              >Ẩn đi
+            </v-btn>
+            <v-btn
+              @click="updateTrangThai"
+              style="
+                color: white;
+                font-weight: bold;
+                width: auto;
+                padding: 10px;
+                margin: 10px 10px;
+                border: 1px solid #bbbbbb !important;
+                border-radius: 4px;
+                box-sizing: border-box;
+                font-size: 16px;
+                display: none;
+                background-color: rgb(38, 113, 184) !important;
+              "
               >Cập nhật trạng thái
             </v-btn>
           </v-col>
@@ -120,7 +139,7 @@
             :headers="tableHeaders"
             :items="data"
             :items-per-page="30"
-            class="elevation-1"
+            class="elevation-1 custom-align"
             no-data-text="Không có log"
           >
             <template v-slot:item.requestBody="{ item }">
@@ -133,6 +152,13 @@
               >
                 {{ item.requestBody }}
               </pre>
+              <v-icon
+                class="ml-2 cursor-pointer round-icon"
+                @click="copyToClipboard(item.requestBody)"
+                :style="iconStyle"
+              >
+                mdi-table-edit
+              </v-icon>
             </template>
             <template v-slot:item.responseBody="{ item }">
               <pre>{{ item.responseBody }}</pre>
@@ -144,6 +170,32 @@
             </template>
           </v-data-table>
         </v-row>
+        <!-- Dialog -->
+        <v-dialog
+          v-model="dialog"
+          class="custom-dialog"
+          persistent
+          max-width="90%"
+          attach="#attach-dialog-bc6"
+        >
+          <v-card>
+            <v-card-title class="headline" style="margin-bottom: 20px"
+              >Gọi lại<v-icon :style="closeIconStyle" @click="dialog = false">
+                mdi-close
+              </v-icon></v-card-title
+            >
+            <v-card-text>
+              <v-textarea v-model="callAgainTextarea"> </v-textarea>
+            </v-card-text>
+            <v-card-actions>
+              <v-btn color="primary" @click="callAgainFunction()">
+                Gọi lại
+              </v-btn>
+              <v-spacer></v-spacer>
+              <v-btn text @click="dialog = false">Đóng</v-btn>
+            </v-card-actions>
+          </v-card>
+        </v-dialog>
       </v-container>
     </v-app>
   </div>
@@ -196,14 +248,16 @@ export default {
       maHso: "",
       maHso2: "",
       module: "",
+      dialog: false,
+      callAgainTextarea: "",
       tableHeaders: [
-        { text: "Dossier Code", value: "dossierCode" },
-        { text: "Call Time", value: "callTime" },
-        { text: "Request Body", value: "requestBody" },
-        { text: "Response Body", value: "responseBody" },
+        { text: "Dossier Code", value: "dossierCode", align: "start" },
+        { text: "Call Time", value: "callTime", align: "start" },
+        { text: "Request Body", value: "requestBody", align: "start" },
+        { text: "Response Body", value: "responseBody", align: "end" },
         // { text: "Security Key", value: "securityKey" },
         { text: "Trang Thai", value: "requestBody.trangThai" },
-        { text: "Action", value: "action", sortable: false },
+        { text: "Action", value: "action", sortable: false, align: "end" },
       ],
       data: [],
       trangThaiHoSo: {},
@@ -219,6 +273,12 @@ export default {
         await this.getHsoId();
       }
       this.getTTHosO();
+    },
+
+    copyToClipboard(item) {
+      this.dialog = true;
+      console.log(item);
+      this.callAgainTextarea = JSON.stringify(item, null, 2);
     },
 
     async checkTrangThai() {
@@ -331,6 +391,41 @@ export default {
         }
       }
     },
+
+    async callAgainFunction() {
+      console.log(this.callAgainTextarea);
+      const dayLaiUrl = `https://apiigate.gialai.gov.vn/ad/api/lienthongDVCLT/capNhatTrangThaiHoSoDVCLTHoTich`;
+      try {
+        const response = await axios.post(
+          dayLaiUrl,
+          JSON.parse(this.callAgainTextarea, null, 2),
+          {
+            headers: {
+              Authorization: `Bearer ${this.igateToken}`, // Đính kèm token vào header
+            },
+          }
+        );
+        if (response) {
+          console.log(response.data);
+          if (response.data.status == 200) {
+            alert(response.data.title);
+          } else {
+            alert(response.data.errors.soHoSoLT[0]);
+          }
+        }
+      } catch (error) {
+        alert(error);
+        if (error.response) {
+          console.error("Dữ liệu phản hồi lỗi:", error.response.data);
+          console.error("Trạng thái phản hồi lỗi:", error.response.status);
+        } else if (error.request) {
+          console.error("Yêu cầu lỗi:", error.request);
+        } else {
+          console.error("Thông báo lỗi:", error.message);
+        }
+      }
+    },
+
     async handleButtonClick(item) {
       console.log(item);
       const dayLaiUrl = `https://apiigate.gialai.gov.vn/ad/api/lienthongDVCLT/capNhatTrangThaiHoSoDVCLTHoTich`;
