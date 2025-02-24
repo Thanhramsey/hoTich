@@ -220,21 +220,29 @@
               <label for="maHso" style="font-size: large; font-weight: bold"
                 >Mã hồ sơ:</label
               >
+
               <input
                 type="text"
                 id="maHso"
                 v-model="maHso"
                 required
                 style="
-                  width: 100%;
+                  width: auto;
                   padding: 10px;
-                  margin: 10px 0;
+                  margin: 10px;
                   border: 1px solid #bbbbbb !important;
                   border-radius: 4px;
                   box-sizing: border-box;
                   font-size: 16px;
                 "
               />
+              <v-icon
+                class="ml-2 cursor-pointer round-icon"
+                @click="extractMaHo"
+                :style="iconStyle"
+              >
+                mdi mdi-atom
+              </v-icon>
             </div>
             <p v-if="eformData" style="color: red; display: none">
               eformData: {{ eformData }}
@@ -348,8 +356,8 @@ export default {
         backgroundColor: "#1976d2 !important" /* Màu nền của icon */,
         color: "white" /* Màu của icon */,
         borderRadius: "50%" /* Bo tròn để tạo hình tròn */,
-        padding: "5px" /* Thêm không gian xung quanh icon */,
-        fontSize: "15px" /* Kích thước icon */,
+        padding: "10px" /* Thêm không gian xung quanh icon */,
+        fontSize: "25px" /* Kích thước icon */,
         marginBottom: "5px",
       };
     },
@@ -421,6 +429,15 @@ export default {
       if (textarea) {
         textarea.select();
         document.execCommand("copy");
+      }
+    },
+
+    extractMaHo() {
+      const match = this.maHso.match(/(H21|G22)\.\d{2}\.\d{2}-\d{6}-\d{4}/);
+      if (match) {
+        this.maHso = match[0]; // Gán lại chỉ phần cần lấy
+      } else {
+        alert("Không tìm thấy mã hồ sơ hợp lệ!");
       }
     },
 
@@ -520,6 +537,9 @@ export default {
           },
         });
         console.log("content:", getHsId);
+        if (getHsId.data.content[0].nationCode) {
+          this.maHso = getHsId.data.content[0].code;
+        }
         this.hsoId = getHsId.data.content[0].id;
         this.isDVCLT = getHsId.data.content[0].isDVCLT;
         let agency = getHsId.data.content[0].agency.code;

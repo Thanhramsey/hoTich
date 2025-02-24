@@ -30,7 +30,14 @@
           </v-col>
 
           <v-col cols="12" md="2" xs="12">
-            <span style="color: red; font-weight: bold"
+            <v-icon
+              class="cursor-pointer round-icon"
+              @click="extractMaHo"
+              :style="iconStyle"
+            >
+              mdi mdi-atom
+            </v-icon>
+            <span style="color: red; font-weight: bold; margin-left: 10px"
               >Module: {{ module }}</span
             >
           </v-col>
@@ -65,9 +72,26 @@
                 border-radius: 4px;
                 box-sizing: border-box;
                 font-size: 16px;
-                background-color: rgb(38, 113, 184) !important;
+                background-color: rgb(231 13 34) !important;
               "
               >Get log hồ sơ</v-btn
+            >
+
+            <v-btn
+              @click="getKetQua"
+              style="
+                color: white;
+                font-weight: bold;
+                width: auto;
+                padding: 10px;
+                margin: 10px 10px;
+                border: 1px solid #bbbbbb !important;
+                border-radius: 4px;
+                box-sizing: border-box;
+                font-size: 16px;
+                background-color: #28a745 !important;
+              "
+              >Lấy kết quả</v-btn
             >
             <v-btn
               @click="checkTrangThai"
@@ -81,25 +105,26 @@
                 border-radius: 4px;
                 box-sizing: border-box;
                 font-size: 16px;
-                background-color: rgb(38, 113, 184) !important;
+                background-color: #fd7e14 !important;
               "
-              >Kiểm tra trạng thái hồ sơ</v-btn
+              >KTTT hồ sơ</v-btn
             >
             <v-btn
-              @click="getKetQua"
+              @click="endHoSo"
+              variant="outlined"
               style="
                 color: white;
                 font-weight: bold;
                 width: auto;
                 padding: 10px;
-                margin: 10px 10px;
+                margin: 10px 0;
                 border: 1px solid #bbbbbb !important;
                 border-radius: 4px;
                 box-sizing: border-box;
                 font-size: 16px;
-                background-color: rgb(38, 113, 184) !important;
+                background-color: #ce7a58 !important;
               "
-              >Lấy kết quả</v-btn
+              >Kết thúc hồ sơ</v-btn
             >
           </v-col>
         </v-row>
@@ -268,8 +293,8 @@ export default {
         backgroundColor: "#1976d2 !important" /* Màu nền của icon */,
         color: "white" /* Màu của icon */,
         borderRadius: "50%" /* Bo tròn để tạo hình tròn */,
-        padding: "5px" /* Thêm không gian xung quanh icon */,
-        fontSize: "15px" /* Kích thước icon */,
+        padding: "10px" /* Thêm không gian xung quanh icon */,
+        fontSize: "25px" /* Kích thước icon */,
         marginBottom: "5px",
       };
     },
@@ -303,6 +328,7 @@ export default {
       maHso: "",
       maHso2: "",
       module: "",
+      hsoId: "",
       dialog: false,
       dialogLT: false,
       callAgainTextarea: "",
@@ -329,6 +355,60 @@ export default {
         await this.getHsoId();
       }
       this.getTTHosO();
+    },
+
+    extractMaHo() {
+      const match = this.maHso.match(/(H21|G22)\.\d{2}\.\d{2}-\d{6}-\d{4}/);
+      const match2 = this.maHso2.match(/(H21|G22)\.\d{2}\.\d{2}-\d{6}-\d{4}/);
+      if (match) {
+        this.maHso = match[0]; // Gán lại chỉ phần cần lấy
+      } else if (match2) {
+        this.maHso2 = match2[0];
+      } else {
+        alert("Không tìm thấy mã hồ sơ hợp lệ!");
+      }
+    },
+
+    async endHoSo() {
+      this.loading = true;
+      await this.getHsoId();
+      if (this.hsoId) {
+        await this.endProcess();
+      }
+    },
+
+    async endProcess() {
+      if (this.hsoId == "") {
+        alert("Không có thông tin");
+      } else {
+        const url =
+          "https://apiigate.gialai.gov.vn/pa/dossier/--force-end-process";
+        var endRequestBody = [
+          {
+            id: this.hsoId,
+            code: this.maHso2,
+          },
+        ]; // Chuyển requestBodyString về dạng object
+        console.log(this.requestBody);
+        try {
+          const response = await axios.put(url, endRequestBody, {
+            headers: {
+              Authorization: `Bearer ${this.igateToken}`,
+              "Content-Type": "application/json", // Content-Type của body là JSON
+            },
+          });
+          console.log("Response:", response.data);
+
+          alert("Kết thúc thành công");
+        } catch (error) {
+          console.error(
+            "Error:",
+            error.response ? error.response.data : error.message
+          );
+        } finally {
+          alert("Không có thông tin");
+        }
+      }
     },
 
     copyToClipboard(item) {
@@ -375,6 +455,7 @@ export default {
           this.maHso2 = getHsId.data.content[0].code;
           this.maHso = getHsId.data.content[0].nationCode;
           this.module = getHsId.data.content[0].eForm.data.loaiHTTP;
+          this.hsoId = getHsId.data.content[0].id;
         }
       } catch (error) {
         alert("lỖI");
