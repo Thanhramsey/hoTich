@@ -155,6 +155,7 @@
                           :type="isSuccess ? 'success' : 'error'"
                           border="left"
                           colored-border
+                          max-width="400px"
                         >
                           {{ notificationMessage }}
                         </v-alert>
@@ -216,12 +217,12 @@
               </v-col>
             </v-row>
 
-            <div>
-              <label for="maHso" style="font-size: large; font-weight: bold"
+            <v-row>
+              <!-- <label for="maHso" style="font-size: large; font-weight: bold"
                 >Mã hồ sơ:</label
-              >
+              > -->
 
-              <input
+              <!-- <input
                 type="text"
                 id="maHso"
                 v-model="maHso"
@@ -236,14 +237,26 @@
                   font-size: 16px;
                 "
               />
-              <v-icon
-                class="ml-2 cursor-pointer round-icon"
-                @click="extractMaHo"
-                :style="iconStyle"
-              >
-                mdi mdi-atom
-              </v-icon>
-            </div>
+              <span v-if="maHso" @click="clearText" class="clear-icon">❌</span> -->
+              <v-col>
+                <v-text-field
+                  label="Mã Hồ sơ"
+                  v-model="maHso"
+                  outlined
+                  append-icon="mdi-close-circle"
+                  @click:append="clearText"
+                ></v-text-field>
+              </v-col>
+              <v-col>
+                <v-icon
+                  class="ml-2 cursor-pointer round-icon"
+                  @click="extractMaHo"
+                  :style="iconStyle"
+                >
+                  mdi mdi-atom
+                </v-icon>
+              </v-col>
+            </v-row>
             <p v-if="eformData" style="color: red; display: none">
               eformData: {{ eformData }}
             </p>
@@ -454,6 +467,9 @@ export default {
       const source = user + ":" + password;
       const Authorization = "Basic " + Buffer.from(source).toString("base64");
       return Authorization;
+    },
+    clearText() {
+      this.maHso = ""; // Xóa nội dung input
     },
 
     async getToken() {
@@ -717,7 +733,7 @@ export default {
       this.loading = true;
       if (this.token == "") {
         this.loading = false;
-        this.notificationMessage = " Chưa có token GLI";
+        this.notificationMessage = "Chưa có token GLI";
         this.isSuccess = false;
         this.showError();
       } else {

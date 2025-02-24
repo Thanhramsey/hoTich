@@ -18,6 +18,8 @@
               label="Mã Hồ sơ"
               v-model="maHso2"
               outlined
+              append-icon="mdi-close-circle"
+              @click:append="clearText"
             ></v-text-field>
           </v-col>
           <v-col cols="12" md="5" xs="12">
@@ -26,6 +28,8 @@
               label="Mã Hồ sơ Liên Thông"
               v-model="maHso"
               outlined
+              append-icon="mdi-close-circle"
+              @click:append="clearText2"
             ></v-text-field>
           </v-col>
 
@@ -355,6 +359,12 @@ export default {
         await this.getHsoId();
       }
       this.getTTHosO();
+    },
+    clearText() {
+      this.maHso2 = ""; // Xóa nội dung input
+    },
+    clearText2() {
+      this.maHso = ""; // Xóa nội dung input
     },
 
     extractMaHo() {
