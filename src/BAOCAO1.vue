@@ -175,6 +175,45 @@
                     </v-card>
                   </v-dialog>
 
+                  <v-dialog
+                    v-model="dialogDV"
+                    class="custom-dialog"
+                    persistent
+                    max-width="90%"
+                    :style="imageStyle"
+                  >
+                    <v-card>
+                      <v-card-title class="headline" style="margin-bottom: 20px"
+                        >Dialog Đơn vị<v-icon
+                          :style="closeIconStyle"
+                          @click="dialogDV = false"
+                        >
+                          mdi-close
+                        </v-icon></v-card-title
+                      >
+                      <v-card-text>
+                        <v-text-field
+                          v-model="searchDV"
+                          label="Tìm kiếm..."
+                          class="mb-3"
+                          outlined
+                          dense
+                        ></v-text-field>
+
+                        <v-data-table
+                          :headers="headersDV"
+                          :items="itemsdDV"
+                          :search="searchDV"
+                          class="elevation-1"
+                        ></v-data-table>
+                      </v-card-text>
+                      <v-card-actions>
+                        <v-spacer></v-spacer>
+                        <v-btn text @click="dialog = false">Đóng</v-btn>
+                      </v-card-actions>
+                    </v-card>
+                  </v-dialog>
+
                   <textarea
                     class="textarea"
                     type="text"
@@ -332,6 +371,24 @@
             >
               Đẩy qua hộ tịch
             </v-btn>
+            <v-btn
+              @click="showDialogDV"
+              variant="outlined"
+              style="
+                color: white;
+                width: auto;
+                font-weight: bold;
+                padding: 20px;
+                margin: 10px 0;
+                border: 1px solid #bbbbbb !important;
+                border-radius: 4px;
+                box-sizing: border-box;
+                font-size: 16px;
+                background-color: rgb(38, 113, 184) !important;
+              "
+            >
+              Tra Cứu Mã Đơn vị
+            </v-btn>
             <p v-if="requestBody" style="color: red; display: none">
               Body gửi đi: {{ requestBody }}
             </p>
@@ -359,6 +416,7 @@ import axios from "axios";
 import { jsonToXml } from "./jsonToXml.js";
 import dviJson from "./dviJson.json";
 import noiDangKyJson from "./noiDangKy.json";
+import maDVHotTich from "./maDVHotTich.json";
 
 export default {
   components: {},
@@ -417,6 +475,7 @@ export default {
       responseHT: "",
       requestBodyString: "",
       dialog: false,
+      dialogDV: false,
       currentImage: "",
       notificationDialog: false,
       notificationMessage: "",
@@ -428,6 +487,17 @@ export default {
       noiDangKy: "",
       ltRequest: {},
       isDVCLT: false,
+      headersDV: [
+        { text: "Tỉnh Thành Phố", value: "Tỉnh Thành Phố" },
+        { text: "Mã TP", value: "Mã TP" },
+        { text: "Quận Huyện", value: "Quận Huyện" },
+        { text: "Mã QH", value: "Mã QH" },
+        { text: "Phường Xã", value: "Phường Xã" },
+        { text: "Mã PX", value: "Mã PX" },
+        { text: "Cấp", value: "Cấp" },
+      ],
+      itemsdDV: maDVHotTich,
+      searchDV: "",
     };
   },
   methods: {
@@ -457,6 +527,10 @@ export default {
     showImage(image) {
       this.currentImage = image; // Cập nhật đường dẫn hình ảnh
       this.dialog = true; // Mở dialog
+    },
+
+    showDialogDV() {
+      this.dialogDV = true; // Mở dialog
     },
 
     showError() {
