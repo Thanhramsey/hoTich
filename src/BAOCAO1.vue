@@ -645,7 +645,8 @@ export default {
         }
         if (
           getHsId.data.content[0].eForm.data.loaiHTTP == "LTKS" ||
-          getHsId.data.content[0].eForm.data.loaiHTTP == "LTKT"
+          getHsId.data.content[0].eForm.data.loaiHTTP == "LTKT" ||
+          getHsId.data.content[0].eForm.data.loaiHTTP == "LTKH"
         ) {
           await this.getLTRequest();
           this.isSuccess = true;
