@@ -632,17 +632,11 @@ export default {
         }
         this.hsoId = getHsId.data.content[0].id;
         this.isDVCLT = getHsId.data.content[0].isDVCLT;
-        let agency = getHsId.data.content[0].agency.code;
-        if (agency) {
-          let dvi = this.dViData.content.find((room) => room.code === agency);
-          this.donViNop = dvi.name;
 
-          var maNoiDangKy = getHsId.data.content[0].eForm.data.noiDangKy;
-          let noiDangKyName = this.noiDangKyJson.find(
-            (data) => data.maDonViHanhChinh === maNoiDangKy
-          );
-          this.noiDangKy = noiDangKyName.tenDonViHanhChinh;
-        }
+        console.log(
+          " getHsId.data.content[0].eForm.data.loaiHTTP",
+          getHsId.data.content[0].eForm.data.loaiHTTP
+        );
         if (
           getHsId.data.content[0].eForm.data.loaiHTTP == "LTKS" ||
           getHsId.data.content[0].eForm.data.loaiHTTP == "LTKT" ||
@@ -652,6 +646,17 @@ export default {
           this.isSuccess = true;
           this.notificationMessage = "Get thông tin hồ sơ thành công";
         } else {
+          let agency = getHsId.data.content[0].agency.code;
+          if (agency) {
+            let dvi = this.dViData.content.find((room) => room.code === agency);
+            this.donViNop = dvi.name;
+
+            var maNoiDangKy = getHsId.data.content[0].eForm.data.noiDangKy;
+            let noiDangKyName = this.noiDangKyJson.find(
+              (data) => data.maDonViHanhChinh === maNoiDangKy
+            );
+            this.noiDangKy = noiDangKyName.tenDonViHanhChinh;
+          }
           this.isSuccess = true;
           this.notificationMessage = "Get thông tin hồ sơ thành công";
           this.showError();
@@ -816,7 +821,11 @@ export default {
           "https://congdichvu.gialai.gov.vn:443/hotich/1.0/dangKyHoTich";
         var bodySend = JSON.parse(this.requestBodyString); // Chuyển requestBodyString về dạng object
 
-        if (bodySend.module == "LTKS" || bodySend.module == "LTKT") {
+        if (
+          bodySend.module == "LTKS" ||
+          bodySend.module == "LTKT" ||
+          bodySend.module == "LTKH"
+        ) {
           url =
             "https://congdichvu.gialai.gov.vn:443/apiLienThongKSKT/1.0/nhanHoSoDKHT";
         }
