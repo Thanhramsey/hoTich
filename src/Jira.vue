@@ -496,7 +496,7 @@ export default {
 
       try {
         while (true) {
-          const url = `https://10.54.33.4/bsc/api/jira/jira-data?fromDate=${from}&toDate=${to}&startAt=${startAt}&maxResults=${maxResults}`;
+          const url = `http://10.54.33.4/bsc/api/jira/jira-data?fromDate=${from}&toDate=${to}&startAt=${startAt}&maxResults=${maxResults}`;
 
           const response = await fetch(url, {
             method: "GET",
