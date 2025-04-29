@@ -17,6 +17,7 @@
         class="text-capitalize font-weight-medium vnpt-text"
         :class="{ 'text-primary': $route.path === '/hotich' }"
         @click="$router.push('/hotich')"
+        style="color: #0057a6; background-color: #ffffff !important"
       >
         Hộ Tịch
       </v-btn>
@@ -26,6 +27,7 @@
         class="text-capitalize font-weight-medium vnpt-text"
         :class="{ 'text-primary': $route.path === '/jira' }"
         @click="$router.push('/jira')"
+        style="color: #0057a6; background-color: #ffffff !important"
       >
         Jira
       </v-btn>
