@@ -553,9 +553,9 @@ export default {
             issuekey: issue.key,
             index: idx + 1,
             donViNhap: fields.customfield_10329?.value || "Không rõ",
-            creator: fields.creator.displayName,
-            assignee: fields.assignee.displayName,
-            status: fields.status.name,
+            creator: fields.creator?.displayName || "Không rõ",
+            assignee: fields.assignee?.displayName || "Không có người xử lý",
+            status: fields.status?.name || "Không rõ",
             created: createdDate,
             updated: updatedDate,
           };
@@ -571,49 +571,3 @@ export default {
   },
 };
 </script>
-
-<style>
-.search-btn {
-  margin-top: -28px !important;
-}
-/* .v-icon--link {
-  display: none !important;
-} */
-.custom-group-table th[aria-colindex="1"], /* Nhắm mục tiêu đến cột đầu tiên (cột group) trong header */
-.custom-group-table td:nth-child(1) {
-  /* Nhắm mục tiêu đến cột đầu tiên (cột group) trong body */
-  min-width: 300px; /* Đặt chiều rộng tối thiểu mong muốn */
-  width: auto !important; /* Cho phép cột tự động điều chỉnh nếu nội dung lớn hơn */
-}
-
-.custom-group-header-cell {
-  min-width: 350px; /* Đặt chiều rộng tối thiểu cho ô header group */
-  width: auto !important;
-}
-.custom-group-table th > span:last-child {
-  display: none !important;
-}
-.bg-light-blue {
-  background-color: #f0f8ff;
-}
-.custom-group-table th,
-.custom-group-table td {
-  padding: 10px !important;
-  font-size: 14px;
-}
-.custom-group-table th {
-  background-color: #1976d2;
-  font-weight: bold;
-}
-
-.custom-group-table th span {
-  color: #ffffff;
-}
-.v-data-table-header th {
-  border-bottom: none !important;
-}
-.text-red {
-  color: red;
-  font-weight: bold;
-}
-</style>

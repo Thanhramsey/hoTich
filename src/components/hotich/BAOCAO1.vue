@@ -277,7 +277,7 @@
                 "
               />
               <span v-if="maHso" @click="clearText" class="clear-icon">❌</span> -->
-              <v-col>
+              <v-col cols="12" md="6" sm="8">
                 <v-text-field
                   label="Mã Hồ sơ"
                   v-model="maHso"
@@ -286,7 +286,7 @@
                   @click:append="clearText"
                 ></v-text-field>
               </v-col>
-              <v-col>
+              <v-col cols="12" md="6" sm="2">
                 <v-icon
                   class="ml-2 cursor-pointer round-icon"
                   @click="extractMaHo"
