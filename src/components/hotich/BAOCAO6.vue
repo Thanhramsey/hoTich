@@ -121,7 +121,7 @@
                 font-weight: bold;
                 width: auto;
                 padding: 10px;
-                margin: 10px 0;
+                margin: 10px 10px;
                 border: 1px solid #bbbbbb !important;
                 border-radius: 4px;
                 box-sizing: border-box;
@@ -130,6 +130,31 @@
               "
               >Kết thúc hồ sơ</v-btn
             >
+            <v-btn
+              @click="resendNhieuHoSo"
+              :disabled="loading"
+              variant="outlined"
+              style="
+                color: white;
+                font-weight: bold;
+                width: auto;
+                padding: 10px;
+                margin: 10px 0;
+                border: 1px solid #bbbbbb !important;
+                border-radius: 4px;
+                box-sizing: border-box;
+                font-size: 16px;
+                background-color: #ce7a58 !important;
+              "
+              >Kéo hso về mcua
+              <v-progress-circular
+                v-if="loading"
+                indeterminate
+                color="white"
+                size="20"
+                class="ml-2"
+              ></v-progress-circular
+            ></v-btn>
           </v-col>
         </v-row>
         <v-row v-if="istrangThaiHoSoSuccess">
@@ -280,6 +305,51 @@
             </iframe>
           </v-card>
         </v-dialog>
+
+        <v-dialog
+          v-model="ketQuaDialog"
+          max-width="700px"
+          persistent
+          attach="#attach-dialog-bc6"
+        >
+          <v-card>
+            <v-card-title class="headline">
+              <v-icon left>
+                {{ isAllSuccess ? "mdi-check-circle" : "mdi-alert-circle" }}
+              </v-icon>
+              {{
+                isAllSuccess
+                  ? "Tất cả hồ sơ gửi lại thành công"
+                  : "Kết quả gửi lại hồ sơ"
+              }}
+            </v-card-title>
+
+            <v-card-text>
+              <v-alert
+                v-for="(item, index) in ketQuaNhieu"
+                :key="index"
+                :type="item.status === 'success' ? 'success' : 'error'"
+                dense
+                outlined
+                class="mb-2"
+              >
+                <strong>{{ item.nationCode }}:</strong>
+                {{
+                  item.status === "success"
+                    ? "✅ Thành công"
+                    : "❌ Thất bại: " + (item.message || "Không rõ lỗi")
+                }}
+              </v-alert>
+            </v-card-text>
+
+            <v-card-actions>
+              <v-spacer></v-spacer>
+              <v-btn color="primary" @click="ketQuaDialog = false">
+                Đóng
+              </v-btn>
+            </v-card-actions>
+          </v-card>
+        </v-dialog>
       </v-container>
     </v-app>
   </div>
@@ -325,12 +395,23 @@ export default {
         justifyContent: "center",
       };
     },
+    isAllSuccess() {
+      return (
+        this.ketQuaNhieu.length > 0 &&
+        this.ketQuaNhieu.every((item) => item.status === "success")
+      );
+    },
   },
   data() {
     return {
       igateToken: "",
       maHso: "",
       maHso2: "",
+      ketQuaDialog: false,
+      isSuccess: false,
+      ketQuaNhieu: [],
+      ketQua: "",
+      loading: false,
       module: "",
       hsoId: "",
       dialog: false,
@@ -365,6 +446,10 @@ export default {
     },
     clearText2() {
       this.maHso = ""; // Xóa nội dung input
+    },
+    showError() {
+      this.ketQuaDialog = true; // Mở dialog
+      this.loading = false;
     },
 
     extractMaHo() {
@@ -478,6 +563,90 @@ export default {
           console.error("Thông báo lỗi:", error.message);
         }
       }
+    },
+
+    async keoHoSo() {
+      this.loading = true;
+      const nationCode = this.maHso.trim();
+      if (!nationCode) {
+        alert("Vui lòng nhập mã hồ sơ!");
+        return;
+      }
+      if (!this.igateToken) {
+        alert("Vui lòng nhập token!");
+        return;
+      }
+
+      try {
+        const resendResponse = await axios.post(
+          // "https://wsms.gialai.vnpt.vn/wsms/api/igate/resend-one",
+          "https://wsms.gialai.vnpt.vn/wsms/api/igate/resend-one",
+          {
+            nationCode,
+            token: this.igateToken,
+          }
+        );
+        console.log(resendResponse);
+
+        const result = resendResponse.data;
+        if (result.status === "success") {
+          // alert("Gửi lại thành công!");
+          this.ketQua = "Gửi lại thành công!";
+          this.isSuccess = true;
+          this.showError();
+        } else {
+          this.ketQua = "Gửi lại thất bại: " + JSON.stringify(result);
+          this.isSuccess = false;
+          this.showError();
+        }
+      } catch (error) {
+        console.error("Lỗi:", error);
+        this.isSuccess = false;
+        this.ketQua =
+          "Gửi lại thất bại: " + (error.response?.data || error.message);
+        this.showError();
+      }
+    },
+
+    async resendNhieuHoSo() {
+      this.loading = true;
+      const rawList = this.maHso
+        .split(",")
+        .map((s) => s.trim())
+        .filter((s) => s.length > 0);
+
+      if (!this.igateToken || rawList.length === 0) {
+        alert("Vui lòng nhập mã hồ sơ và token.");
+        return;
+      }
+
+      this.ketQuaNhieu = [];
+
+      for (let ma of rawList) {
+        try {
+          const res = await axios.post(
+            "https://wsms.gialai.vnpt.vn/wsms/api/igate/resend-one",
+            {
+              nationCode: ma,
+              token: this.igateToken,
+            }
+          );
+
+          this.ketQuaNhieu.push({
+            nationCode: ma,
+            status: res.data.status,
+            message: res.data.message || "",
+          });
+        } catch (err) {
+          this.ketQuaNhieu.push({
+            nationCode: ma,
+            status: "error",
+            message: err.message || "Lỗi không xác định",
+          });
+        }
+      }
+      this.loading = false;
+      this.ketQuaDialog = true;
     },
 
     async getTTHosO() {
