@@ -1,19 +1,22 @@
 module.exports = {
   devServer: {
     proxy: {
-      '/api': {
-        target: 'https://congdichvu.gialai.gov.vn',
+      "/api": {
+        target: "https://congdichvu.gialai.gov.vn",
         changeOrigin: true,
-        pathRewrite: { '^/api': '' }
+        pathRewrite: { "^/api": "" },
       },
-      '/igate': {
-        target: 'https://apiigate.gialai.gov.vn',
+      "/igate": {
+        target: "https://apiigate.gialai.gov.vn",
         changeOrigin: true,
-        pathRewrite: { '^/igate': '' }
+        pathRewrite: { "^/igate": "" },
       },
-    }
+      "/lgsp": {
+        target: "https://lgsp.binhdinh.gov.vn",
+        changeOrigin: true,
+        pathRewrite: { "^/lgsp": "" },
+      },
+    },
   },
-  publicPath: process.env.NODE_ENV === 'production'
-    ? '/hoTich/'
-    : '/'
+  publicPath: process.env.NODE_ENV === "production" ? "/hoTich/" : "/",
 };

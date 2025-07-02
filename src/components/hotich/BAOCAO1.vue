@@ -70,7 +70,7 @@
               <v-col cols="12" xs="12" md="5">
                 <div>
                   <label
-                    for="igateToken"
+                    for="gliToken"
                     style="font-size: large; font-weight: bold"
                     >gliToken:</label
                   >
@@ -81,19 +81,22 @@
                   >
                     mdi-content-copy
                   </v-icon>
-                  <textarea
-                    class="textarea"
-                    type="text"
-                    id="gliToken"
+                  <v-text-field
                     v-model="token"
-                    required
-                    style="
-                      width: 100%;
-                      height: 100px;
-                      box-sizing: border-box;
-                      border: 1px solid #bbbbbb !important;
-                    "
-                  ></textarea>
+                    label="token"
+                    outlined
+                    append-icon="mdi-close-circle"
+                    @click:append="clearText2"
+                  ></v-text-field>
+
+                  <v-text-field
+                    id="lgspaccesstoken"
+                    v-model="lgspaccesstoken"
+                    label="lgspaccesstoken"
+                    outlined
+                    append-icon="mdi-close-circle"
+                    @click:append="clearText3"
+                  ></v-text-field>
                 </div>
               </v-col>
               <v-col cols="12" xs="12" md="5"
@@ -214,19 +217,13 @@
                     </v-card>
                   </v-dialog>
 
-                  <textarea
+                  <v-textarea
                     class="textarea"
                     type="text"
                     id="igateToken"
                     v-model="igateToken"
                     required
-                    style="
-                      width: 100%;
-                      height: 100px;
-                      box-sizing: border-box;
-                      border: 1px solid #bbbbbb !important;
-                    "
-                  ></textarea>
+                  ></v-textarea>
                 </div>
               </v-col>
               <v-col
@@ -308,7 +305,7 @@
                 font-weight: bold;
                 width: auto;
                 padding: 20px;
-                margin: 10px 0;
+                margin: 10px 10px 10px 0px;
                 border: 1px solid #bbbbbb !important;
                 border-radius: 4px;
                 box-sizing: border-box;
@@ -326,6 +323,26 @@
               Lấy dữ liệu hồ sơ
             </v-btn>
             <v-btn
+              @click="pushHoTich2"
+              :disabled="loading"
+              variant="outlined"
+              style="
+                color: white;
+                width: auto;
+                font-weight: bold;
+                padding: 20px;
+                margin: 10px 10px 10px 0px;
+                border: 1px solid #bbbbbb !important;
+                border-radius: 4px;
+                box-sizing: border-box;
+                font-size: 16px;
+                background-color: rgb(38 184 50) !important;
+              "
+            >
+              Đẩy qua hộ tịch
+            </v-btn>
+
+            <v-btn
               @click="endHoSo"
               :disabled="loading"
               variant="outlined"
@@ -334,7 +351,7 @@
                 font-weight: bold;
                 width: auto;
                 padding: 20px;
-                margin: 10px 0;
+                margin: 10px 10px 10px 0px;
                 border: 1px solid #bbbbbb !important;
                 border-radius: 4px;
                 box-sizing: border-box;
@@ -343,34 +360,6 @@
               "
               >Kết thúc hồ sơ</v-btn
             >
-            <p v-if="donViNop" style="color: red">
-              <b>Hồ sơ của đơn vị: {{ donViNop }}</b>
-            </p>
-            <p v-if="noiDangKy" style="color: red">
-              <b>Nơi đăng ký trong eform: {{ noiDangKy }}</b>
-            </p>
-          </section>
-          <section class="mt-5">
-            <h2 class="mb-5">Đẩy qua hộ tịch</h2>
-            <v-btn
-              @click="pushHoTich"
-              :disabled="loading"
-              variant="outlined"
-              style="
-                color: white;
-                width: auto;
-                font-weight: bold;
-                padding: 20px;
-                margin: 10px 0;
-                border: 1px solid #bbbbbb !important;
-                border-radius: 4px;
-                box-sizing: border-box;
-                font-size: 16px;
-                background-color: rgb(38, 113, 184) !important;
-              "
-            >
-              Đẩy qua hộ tịch
-            </v-btn>
             <v-btn
               @click="showDialogDV"
               variant="outlined"
@@ -389,18 +378,36 @@
             >
               Tra Cứu Mã Đơn vị
             </v-btn>
+            <p v-if="donViNop" style="color: red">
+              <b>Hồ sơ của đơn vị: {{ donViNop }}</b>
+            </p>
+            <p v-if="noiDangKy" style="color: red">
+              <b>Nơi đăng ký trong eform: {{ noiDangKy }}</b>
+            </p>
+          </section>
+          <section class="mt-5">
             <p v-if="requestBody" style="color: red; display: none">
               Body gửi đi: {{ requestBody }}
             </p>
-            <textarea
-              v-model="requestBodyString"
-              style="
-                width: 100%;
-                height: 300px;
-                box-sizing: border-box;
-                border: 1px solid #bbbbbb !important;
-              "
-            ></textarea>
+            <div style="position: relative">
+              <v-textarea
+                v-model="requestBodyString"
+                label="Request Body"
+                outlined
+                auto-grow
+                rows="10"
+              ></v-textarea>
+
+              <v-btn
+                small
+                color="warning"
+                style="position: absolute; top: 4px; right: 4px; z-index: 1"
+                @click="filterRequestBody"
+              >
+                Lọc inputSend
+              </v-btn>
+            </div>
+
             <p v-if="responseHT" style="color: purple">
               Kết quả trả về từ hộ tịch: {{ responseHT }}
             </p>
@@ -461,6 +468,7 @@ export default {
       username: "",
       password: "",
       token: "",
+      lgspaccesstoken: "",
       maHso: "",
       hsoId: "",
       igateToken: "",
@@ -488,13 +496,8 @@ export default {
       ltRequest: {},
       isDVCLT: false,
       headersDV: [
-        { text: "Tỉnh Thành Phố", value: "Tỉnh Thành Phố" },
-        { text: "Mã TP", value: "Mã TP" },
-        { text: "Quận Huyện", value: "Quận Huyện" },
-        { text: "Mã QH", value: "Mã QH" },
-        { text: "Phường Xã", value: "Phường Xã" },
-        { text: "Mã PX", value: "Mã PX" },
-        { text: "Cấp", value: "Cấp" },
+        { text: "Mã Đơn vị", value: "value" },
+        { text: "Tên đơn vị", value: "label" },
       ],
       itemsdDV: maDVHotTich,
       searchDV: "",
@@ -512,6 +515,19 @@ export default {
       if (textarea) {
         textarea.select();
         document.execCommand("copy");
+      }
+    },
+
+    filterRequestBody() {
+      try {
+        const parsed = JSON.parse(this.requestBodyString);
+        if (parsed.inputSend && typeof parsed.inputSend === "object") {
+          this.requestBodyString = JSON.stringify(parsed.inputSend, null, 2);
+        } else {
+          this.$toast?.error?.("Không tìm thấy hoặc inputSend không hợp lệ");
+        }
+      } catch (err) {
+        this.$toast?.error?.("Dữ liệu JSON không hợp lệ");
       }
     },
 
@@ -544,6 +560,12 @@ export default {
     },
     clearText() {
       this.maHso = ""; // Xóa nội dung input
+    },
+    clearText2() {
+      this.token = ""; // Xóa nội dung input
+    },
+    clearText3() {
+      this.lgspaccesstoken = ""; // Xóa nội dung input
     },
 
     async getToken() {
@@ -803,10 +825,100 @@ export default {
 
     async fetchData() {
       this.loading = true;
-      await this.getHsoId();
-      // if (this.hsoId) {
-      //   await this.getData();
-      // }
+      await this.handleSend();
+    },
+
+    async handleSend() {
+      this.resultApi1 = null;
+      // this.resultApi2 = null;
+      // this.errorMsg = "";
+
+      try {
+        // 1. Gọi API 1
+        const api1Url = `https://apiigate.gialai.gov.vn/pa/api-integration/--data?code=${this.maHso}&fields=commonEForm%2CdetailEForm%2CdossierFee%2CcurrentTask`;
+        const res1 = await axios.get(api1Url, {
+          headers: {
+            Authorization: `Bearer ${this.igateToken}`,
+          },
+        });
+
+        const data1 = res1.data;
+        this.resultApi1 = JSON.stringify(data1, null, 2);
+
+        // 2. Lấy option từ API 1
+        const option = `${data1.commonEForm.eformId}-${data1.detailEForm.id}`;
+        const api2Url = `https://apiigate.gialai.gov.vn/ad/service/judicial-civil-status/--new-dossier?option=${option}&showIntputSendEnable=true`;
+
+        const body = {
+          dossierCode: data1.code,
+          resource: data1,
+        };
+
+        // 3. Gửi API 2
+        const res2 = await axios.post(api2Url, body, {
+          headers: {
+            Authorization: `Bearer ${this.igateToken}`,
+            "Content-Type": "application/json", // Content-Type của body là JSON
+          },
+        });
+        // this.resultApi2 = JSON.stringify(res2.data, null, 2);
+        this.requestBodyString = JSON.stringify(res2.data, null, 2);
+        this.isSuccess = true;
+        this.notificationMessage = "Get thông tin hồ sơ thành công";
+      } catch (error) {
+        this.isSuccess = false;
+        this.notificationMessage = "Get thông tin hồ sơ không thành công";
+        if (error.response) {
+          console.error("Dữ liệu phản hồi lỗi:", error.response.data);
+          console.error("Trạng thái phản hồi lỗi:", error.response.status);
+        } else if (error.request) {
+          console.error("Yêu cầu lỗi:", error.request);
+        } else {
+          console.error("Thông báo lỗi:", error.message);
+        }
+      } finally {
+        this.loading = false; // Kết thúc hiển thị loader
+        this.showError();
+      }
+    },
+
+    async pushHoTich2() {
+      this.loading = true;
+      if (this.token == "") {
+        this.loading = false;
+        this.notificationMessage = "Chưa có token GLI";
+        this.isSuccess = false;
+        this.showError();
+      } else {
+        const url = "/lgsp/Lienthonghotich/1.0/nhanHoSoDKHT";
+        var bodySend = JSON.parse(this.requestBodyString); // Chuyển requestBodyString về dạng object
+        try {
+          const response = await axios.post(url, bodySend, {
+            headers: {
+              Authorization: `Bearer ${this.token}`,
+              lgspaccesstoken: `Bearer ${this.token}`,
+              "Content-Type": "application/json",
+            },
+          });
+          console.log("Response:", response.data);
+
+          this.responseHT = response.data;
+          this.notificationMessage = response.data;
+          this.isSuccess = true;
+        } catch (error) {
+          this.notificationMessage = error.response
+            ? error.response.data
+            : error.message;
+          this.isSuccess = false;
+          console.error(
+            "Error:",
+            error.response ? error.response.data : error.message
+          );
+        } finally {
+          this.loading = false; // Kết thúc hiển thị loader
+          this.showError();
+        }
+      }
     },
 
     async pushHoTich() {
