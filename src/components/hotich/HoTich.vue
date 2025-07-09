@@ -32,6 +32,11 @@ import BAOCAO4 from "./BAOCAO4";
 import BAOCAO5 from "./BAOCAO5";
 import BAOCAO6 from "./BAOCAO6";
 import BAOCAO8 from "./BAOCAO8";
+import BAOCAO9 from "./BAOCAO9";
+import BAOCAO10 from "./BAOCAO10";
+import BAOCAO11 from "./BAOCAO11";
+import BAOCAO12 from "./BAOCAO12";
+import DVCLT from "./DVCLT";
 // import BAOCAO7 from "./BAOCAO7";
 export default {
   components: {
@@ -42,6 +47,11 @@ export default {
     BAOCAO4,
     BAOCAO5,
     BAOCAO8,
+    BAOCAO9,
+    BAOCAO10,
+    BAOCAO11,
+    BAOCAO12,
+    DVCLT,
     // BAOCAO7,
   },
   data() {
@@ -51,11 +61,16 @@ export default {
       items: [
         { tab: "Get Token", content: "BAOCAO1" },
         { tab: "DVCLT", content: "BAOCAO6" },
+        { tab: "DVCLT2", content: "DVCLT" },
         { tab: "Kết thúc hàng loạt", content: "BAOCAO2" },
         { tab: "Tạo object", content: "BAOCAO3" },
         { tab: "Clone quy trình DD", content: "BAOCAO4" },
         { tab: "Clone xã", content: "BAOCAO5" },
         { tab: "Clone ", content: "BAOCAO8" },
+        // { tab: "Ex ", content: "BAOCAO9" },
+        // { tab: "Exa ", content: "BAOCAO10" },
+        // { tab: "Exa2 ", content: "BAOCAO11" },
+        // { tab: "Exa222 ", content: "BAOCAO12" },
         // { tab: "DTI", content: "BAOCAO7" },
       ],
     };

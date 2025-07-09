@@ -571,7 +571,8 @@ export default {
     async getToken() {
       try {
         const response = await axios.post(
-          "https://wsms.gialai.vnpt.vn/wsms/api/igate/login-congdvc-gli",
+          "https://wsms.gialai.vnpt.vn/wsms/api/igate/login-lgsp-gli",
+          // "http://localhost:8087/wsms_war/api/igate/login-lgsp-gli",
           null,
           {
             headers: {},
@@ -579,6 +580,7 @@ export default {
         );
         console.log("Token:", response.data);
         this.token = response.data.access_token;
+        this.lgspaccesstoken = response.data.lgspaccesstoken;
 
         const response2 = await axios.post(
           "https://wsms.gialai.vnpt.vn/wsms/api/igate/login-igate",
@@ -884,40 +886,43 @@ export default {
 
     async pushHoTich2() {
       this.loading = true;
-      if (this.token == "") {
+      if (this.token === "") {
         this.loading = false;
         this.notificationMessage = "Chưa có token GLI";
         this.isSuccess = false;
         this.showError();
-      } else {
-        const url = "/lgsp/Lienthonghotich/1.0/nhanHoSoDKHT";
-        var bodySend = JSON.parse(this.requestBodyString); // Chuyển requestBodyString về dạng object
-        try {
-          const response = await axios.post(url, bodySend, {
-            headers: {
-              Authorization: `Bearer ${this.token}`,
-              lgspaccesstoken: `Bearer ${this.token}`,
-              "Content-Type": "application/json",
-            },
-          });
-          console.log("Response:", response.data);
+        return;
+      }
 
-          this.responseHT = response.data;
-          this.notificationMessage = response.data;
-          this.isSuccess = true;
-        } catch (error) {
-          this.notificationMessage = error.response
-            ? error.response.data
-            : error.message;
-          this.isSuccess = false;
-          console.error(
-            "Error:",
-            error.response ? error.response.data : error.message
-          );
-        } finally {
-          this.loading = false; // Kết thúc hiển thị loader
-          this.showError();
-        }
+      const url = "https://wsms.gialai.vnpt.vn/wsms/api/igate/push-ho-tich"; // Gọi API nội bộ
+      // const url = "http://localhost:8087/wsms_war/api/igate/push-ho-tich"; // Gọi API nội
+      const bodySend = JSON.parse(this.requestBodyString);
+
+      try {
+        const response = await axios.post(url, bodySend, {
+          headers: {
+            Authorization: `Bearer ${this.token}`,
+            lgspaccesstoken: `${this.lgspaccesstoken}`,
+            "Content-Type": "application/json",
+          },
+        });
+
+        console.log("Response:", response.data);
+        this.responseHT = response.data;
+        this.notificationMessage = response.data;
+        this.isSuccess = true;
+      } catch (error) {
+        this.notificationMessage = error.response
+          ? error.response.data
+          : error.message;
+        this.isSuccess = false;
+        console.error(
+          "Error:",
+          error.response ? error.response.data : error.message
+        );
+      } finally {
+        this.loading = false;
+        this.showError();
       }
     },
 

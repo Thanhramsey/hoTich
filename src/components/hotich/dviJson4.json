@@ -1,0 +1,387 @@
+[
+    {
+        "DON VI": "UBND Phường An Bình",
+        "MA DON VI": "H21.100",
+        "id": "684a41706c415045e62ac7be"
+    },
+    {
+        "DON VI": "UBND Phường An Khê",
+        "MA DON VI": "H21.101",
+        "id": "684a41706c415045e62ac7c0"
+    },
+    {
+        "DON VI": "UBND Phường An Phú",
+        "MA DON VI": "H21.102",
+        "id": "684a41706c415045e62ac7c2"
+    },
+    {
+        "DON VI": "UBND Phường Ayun Pa",
+        "MA DON VI": "H21.103",
+        "id": "684a41706c415045e62ac7c4"
+    },
+    {
+        "DON VI": "UBND Phường Diên Hồng",
+        "MA DON VI": "H21.104",
+        "id": "684a41706c415045e62ac7c6"
+    },
+    {
+        "DON VI": "UBND Phường Hội Phú",
+        "MA DON VI": "H21.105",
+        "id": "684a41706c415045e62ac7c8"
+    },
+    {
+        "DON VI": "UBND Phường Pleiku",
+        "MA DON VI": "H21.106",
+        "id": "684a41706c415045e62ac7ca"
+    },
+    {
+        "DON VI": "UBND Phường Thống Nhất",
+        "MA DON VI": "H21.107",
+        "id": "684a41706c415045e62ac7cc"
+    },
+    {
+        "DON VI": "UBND Xã Albá",
+        "MA DON VI": "H21.108",
+        "id": "684a41716c415045e62ac7ce"
+    },
+    {
+        "DON VI": "UBND Xã Ayun",
+        "MA DON VI": "H21.109",
+        "id": "684a41716c415045e62ac7d0"
+    },
+    {
+        "DON VI": "UBND Xã Biển Hồ",
+        "MA DON VI": "H21.111",
+        "id": "684a41716c415045e62ac7d4"
+    },
+    {
+        "DON VI": "UBND Xã Bàu Cạn",
+        "MA DON VI": "H21.110",
+        "id": "684a41716c415045e62ac7d2"
+    },
+    {
+        "DON VI": "UBND Xã Bờ Ngoong",
+        "MA DON VI": "H21.112",
+        "id": "684a41716c415045e62ac7d6"
+    },
+    {
+        "DON VI": "UBND Xã Chơ Long",
+        "MA DON VI": "H21.113",
+        "id": "684a41486c415045e62ac78e"
+    },
+    {
+        "DON VI": "UBND Xã Chư A Thai",
+        "MA DON VI": "H21.114",
+        "id": "684a41716c415045e62ac7d8"
+    },
+    {
+        "DON VI": "UBND Xã Chư Krey",
+        "MA DON VI": "H21.115",
+        "id": "684a41486c415045e62ac790"
+    },
+    {
+        "DON VI": "UBND Xã Chư Prông",
+        "MA DON VI": "H21.117",
+        "id": "684a41716c415045e62ac7dc"
+    },
+    {
+        "DON VI": "UBND Xã Chư Păh",
+        "MA DON VI": "H21.116",
+        "id": "684a41716c415045e62ac7da"
+    },
+    {
+        "DON VI": "UBND Xã Chư Pưh",
+        "MA DON VI": "H21.118",
+        "id": "684a41716c415045e62ac7de"
+    },
+    {
+        "DON VI": "UBND Xã Chư Sê",
+        "MA DON VI": "H21.119",
+        "id": "684a41716c415045e62ac7e0"
+    },
+    {
+        "DON VI": "UBND Xã Cửu An",
+        "MA DON VI": "H21.120",
+        "id": "684a41716c415045e62ac7e2"
+    },
+    {
+        "DON VI": "UBND Xã Gào",
+        "MA DON VI": "H21.127",
+        "id": "684a41716c415045e62ac7e8"
+    },
+    {
+        "DON VI": "UBND Xã Hra",
+        "MA DON VI": "H21.128",
+        "id": "684a41716c415045e62ac7ea"
+    },
+    {
+        "DON VI": "UBND Xã Ia Boòng",
+        "MA DON VI": "H21.130",
+        "id": "684a41716c415045e62ac7ec"
+    },
+    {
+        "DON VI": "UBND Xã Ia Băng",
+        "MA DON VI": "H21.129",
+        "id": "684a41486c415045e62ac79a"
+    },
+    {
+        "DON VI": "UBND Xã Ia Chía",
+        "MA DON VI": "H21.131",
+        "id": "684a41716c415045e62ac7ee"
+    },
+    {
+        "DON VI": "UBND Xã Ia Dom",
+        "MA DON VI": "H21.133",
+        "id": "684a41486c415045e62ac79e"
+    },
+    {
+        "DON VI": "UBND Xã Ia Dreh",
+        "MA DON VI": "H21.135",
+        "id": "684a41486c415045e62ac7a0"
+    },
+    {
+        "DON VI": "UBND Xã Ia Dơk",
+        "MA DON VI": "H21.132",
+        "id": "684a41486c415045e62ac79c"
+    },
+    {
+        "DON VI": "UBND Xã Ia Grai",
+        "MA DON VI": "H21.134",
+        "id": "684a41716c415045e62ac7f0"
+    },
+    {
+        "DON VI": "UBND Xã Ia Hiao",
+        "MA DON VI": "H21.136",
+        "id": "684a41486c415045e62ac7a2"
+    },
+    {
+        "DON VI": "UBND Xã Ia Hrung",
+        "MA DON VI": "H21.138",
+        "id": "684a41716c415045e62ac7f4"
+    },
+    {
+        "DON VI": "UBND Xã Ia Hrú",
+        "MA DON VI": "H21.137",
+        "id": "684a41716c415045e62ac7f2"
+    },
+    {
+        "DON VI": "UBND Xã Ia Khươl",
+        "MA DON VI": "H21.139",
+        "id": "684a41716c415045e62ac7f6"
+    },
+    {
+        "DON VI": "UBND Xã Ia Ko",
+        "MA DON VI": "H21.140",
+        "id": "684a41716c415045e62ac7f8"
+    },
+    {
+        "DON VI": "UBND Xã Ia Krái",
+        "MA DON VI": "H21.141",
+        "id": "684a41716c415045e62ac7fa"
+    },
+    {
+        "DON VI": "UBND Xã Ia Krêl",
+        "MA DON VI": "H21.142",
+        "id": "684a41486c415045e62ac7a4"
+    },
+    {
+        "DON VI": "UBND Xã Ia Le",
+        "MA DON VI": "H21.144",
+        "id": "684a41716c415045e62ac7fe"
+    },
+    {
+        "DON VI": "UBND Xã Ia Ly",
+        "MA DON VI": "H21.145",
+        "id": "684a41716c415045e62ac800"
+    },
+    {
+        "DON VI": "UBND Xã Ia Lâu",
+        "MA DON VI": "H21.143",
+        "id": "684a41716c415045e62ac7fc"
+    },
+    {
+        "DON VI": "UBND Xã Ia Mơ",
+        "MA DON VI": "H21.146",
+        "id": "684a41716c415045e62ac802"
+    },
+    {
+        "DON VI": "UBND Xã Ia Nan",
+        "MA DON VI": "H21.147",
+        "id": "684a41486c415045e62ac7a6"
+    },
+    {
+        "DON VI": "UBND Xã Ia O",
+        "MA DON VI": "H21.148",
+        "id": "684a41716c415045e62ac804"
+    },
+    {
+        "DON VI": "UBND Xã Ia Pa",
+        "MA DON VI": "H21.149",
+        "id": "684a41716c415045e62ac806"
+    },
+    {
+        "DON VI": "UBND Xã Ia Phí",
+        "MA DON VI": "H21.150",
+        "id": "684a41716c415045e62ac808"
+    },
+    {
+        "DON VI": "UBND Xã Ia Pia",
+        "MA DON VI": "H21.151",
+        "id": "684a41716c415045e62ac80a"
+    },
+    {
+        "DON VI": "UBND Xã Ia Pnôn",
+        "MA DON VI": "H21.152",
+        "id": "684a41486c415045e62ac7a8"
+    },
+    {
+        "DON VI": "UBND Xã Ia Púch",
+        "MA DON VI": "H21.153",
+        "id": "684a41496c415045e62ac7aa"
+    },
+    {
+        "DON VI": "UBND Xã Ia Rbol",
+        "MA DON VI": "H21.154",
+        "id": "684a41716c415045e62ac80c"
+    },
+    {
+        "DON VI": "UBND Xã Ia Rsai",
+        "MA DON VI": "H21.155",
+        "id": "684a41496c415045e62ac7ac"
+    },
+    {
+        "DON VI": "UBND Xã Ia Sao",
+        "MA DON VI": "H21.156",
+        "id": "684a41496c415045e62ac7ae"
+    },
+    {
+        "DON VI": "UBND Xã Ia Tul",
+        "MA DON VI": "H21.158",
+        "id": "684a41716c415045e62ac810"
+    },
+    {
+        "DON VI": "UBND Xã Ia Tôr",
+        "MA DON VI": "H21.157",
+        "id": "684a41716c415045e62ac80e"
+    },
+    {
+        "DON VI": "UBND Xã KDang",
+        "MA DON VI": "H21.160",
+        "id": "684a41496c415045e62ac7b0"
+    },
+    {
+        "DON VI": "UBND Xã Kbang",
+        "MA DON VI": "H21.159",
+        "id": "684a41726c415045e62ac812"
+    },
+    {
+        "DON VI": "UBND Xã Kon Chiêng",
+        "MA DON VI": "H21.161",
+        "id": "684a41726c415045e62ac814"
+    },
+    {
+        "DON VI": "UBND Xã Kon Gang",
+        "MA DON VI": "H21.162",
+        "id": "684a41726c415045e62ac816"
+    },
+    {
+        "DON VI": "UBND Xã Krong",
+        "MA DON VI": "H21.165",
+        "id": "684a41726c415045e62ac818"
+    },
+    {
+        "DON VI": "UBND Xã Kông Bơ La",
+        "MA DON VI": "H21.163",
+        "id": "684a41496c415045e62ac7b2"
+    },
+    {
+        "DON VI": "UBND Xã Kông Chro",
+        "MA DON VI": "H21.164",
+        "id": "684a41496c415045e62ac7b4"
+    },
+    {
+        "DON VI": "UBND Xã Lơ Pang",
+        "MA DON VI": "H21.166",
+        "id": "684a41726c415045e62ac81a"
+    },
+    {
+        "DON VI": "UBND Xã Mang Yang",
+        "MA DON VI": "H21.167",
+        "id": "684a41726c415045e62ac81c"
+    },
+    {
+        "DON VI": "UBND Xã Phú Thiện",
+        "MA DON VI": "H21.168",
+        "id": "684a41726c415045e62ac81e"
+    },
+    {
+        "DON VI": "UBND Xã Phú Túc",
+        "MA DON VI": "H21.169",
+        "id": "684a41726c415045e62ac820"
+    },
+    {
+        "DON VI": "UBND Xã Pờ Tó",
+        "MA DON VI": "H21.170",
+        "id": "684a41726c415045e62ac822"
+    },
+    {
+        "DON VI": "UBND Xã SRó",
+        "MA DON VI": "H21.172",
+        "id": "684a41496c415045e62ac7b8"
+    },
+    {
+        "DON VI": "UBND Xã Sơn Lang",
+        "MA DON VI": "H21.171",
+        "id": "684a41496c415045e62ac7b6"
+    },
+    {
+        "DON VI": "UBND Xã Tơ Tung",
+        "MA DON VI": "H21.173",
+        "id": "684a41726c415045e62ac824"
+    },
+    {
+        "DON VI": "UBND Xã Uar",
+        "MA DON VI": "H21.174",
+        "id": "684a41726c415045e62ac826"
+    },
+    {
+        "DON VI": "UBND Xã Ya Hội",
+        "MA DON VI": "H21.175",
+        "id": "684a41496c415045e62ac7ba"
+    },
+    {
+        "DON VI": "UBND Xã Ya Ma",
+        "MA DON VI": "H21.176",
+        "id": "684a41496c415045e62ac7bc"
+    },
+    {
+        "DON VI": "UBND Xã Đak Pơ",
+        "MA DON VI": "H21.122",
+        "id": "684a41716c415045e62ac7e4"
+    },
+    {
+        "DON VI": "UBND Xã Đak Rong",
+        "MA DON VI": "H21.123",
+        "id": "684a41716c415045e62ac7e6"
+    },
+    {
+        "DON VI": "UBND Xã Đak Sơmei",
+        "MA DON VI": "H21.124",
+        "id": "684a41486c415045e62ac794"
+    },
+    {
+        "DON VI": "UBND Xã Đak Đoa",
+        "MA DON VI": "H21.121",
+        "id": "684a41486c415045e62ac792"
+    },
+    {
+        "DON VI": "UBND Xã Đăk Song",
+        "MA DON VI": "H21.125",
+        "id": "684a41486c415045e62ac796"
+    },
+    {
+        "DON VI": "UBND Xã Đức Cơ",
+        "MA DON VI": "H21.126",
+        "id": "684a41486c415045e62ac798"
+    }
+]
