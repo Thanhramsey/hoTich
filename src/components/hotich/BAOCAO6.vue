@@ -439,6 +439,7 @@ export default {
       if (this.maHso2 != "") {
         await this.getHsoId();
       }
+      this.loading = false;
       this.getTTHosO();
     },
     clearText() {
@@ -493,7 +494,7 @@ export default {
             },
           });
           console.log("Response:", response.data);
-
+          this.loading = false;
           alert("Kết thúc thành công");
         } catch (error) {
           console.error(
