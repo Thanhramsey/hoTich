@@ -532,9 +532,11 @@ export default {
     },
 
     extractMaHo() {
-      const match = this.maHso.match(/(H21|G22)\.\d{2}\.\d{2}-\d{6}-\d{4}/);
+      const match = this.maHso.match(
+        /H21\.\d{3}-\d{6}-\d{4}|G22\.\d{2}\.\d{2}-\d{6}-\d{4}/
+      );
       if (match) {
-        this.maHso = match[0]; // Gán lại chỉ phần cần lấy
+        this.maHso = match[0];
       } else {
         alert("Không tìm thấy mã hồ sơ hợp lệ!");
       }
@@ -837,7 +839,8 @@ export default {
 
       try {
         // 1. Gọi API 1
-        const api1Url = `https://apiigate.gialai.gov.vn/pa/api-integration/--data?code=${this.maHso}&fields=commonEForm%2CdetailEForm%2CdossierFee%2CcurrentTask`;
+        const maHsoTrimmed = this.maHso.trim().replace(/\s+/g, "");
+        const api1Url = `https://apiigate.gialai.gov.vn/pa/api-integration/--data?code=${maHsoTrimmed}&fields=commonEForm%2CdetailEForm%2CdossierFee%2CcurrentTask`;
         const res1 = await axios.get(api1Url, {
           headers: {
             Authorization: `Bearer ${this.igateToken}`,
