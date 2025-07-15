@@ -282,6 +282,13 @@
                   append-icon="mdi-close-circle"
                   @click:append="clearText"
                 ></v-text-field>
+                <v-checkbox
+                  v-model="isHaveFile"
+                  color="red"
+                  label="Có gửi file"
+                  value="red"
+                  hide-details
+                ></v-checkbox>
               </v-col>
               <v-col cols="12" md="6" sm="2">
                 <v-icon
@@ -468,6 +475,7 @@ export default {
       username: "",
       password: "",
       token: "",
+      isHaveFile: false,
       lgspaccesstoken: "",
       maHso: "",
       hsoId: "",
@@ -840,7 +848,10 @@ export default {
       try {
         // 1. Gọi API 1
         const maHsoTrimmed = this.maHso.trim().replace(/\s+/g, "");
-        const api1Url = `https://apiigate.gialai.gov.vn/pa/api-integration/--data?code=${maHsoTrimmed}&fields=commonEForm%2CdetailEForm%2CdossierFee%2CcurrentTask`;
+        var api1Url = `https://apiigate.gialai.gov.vn/pa/api-integration/--data?code=${maHsoTrimmed}&fields=commonEForm%2CdetailEForm%2CdossierFee%2CcurrentTask`;
+        if (this.isHaveFile) {
+          api1Url = `https://apiigate.gialai.gov.vn/pa/api-integration/--data?code=${maHsoTrimmed}&fields=commonEForm%2CdetailEForm%2CdossierFormFile%2CdossierFee%2CcurrentTask`;
+        }
         const res1 = await axios.get(api1Url, {
           headers: {
             Authorization: `Bearer ${this.igateToken}`,
