@@ -421,6 +421,17 @@
           </section>
         </section>
       </v-container>
+      <v-snackbar
+        v-model="snackbar"
+        :color="snackbarColor"
+        timeout="3000"
+        bottom
+        elevation="10"
+      >
+        <span style="font-size: 18px; font-weight: bold">{{
+          notificationMessage
+        }}</span>
+      </v-snackbar>
     </v-app>
   </div>
 </template>
@@ -509,6 +520,9 @@ export default {
       ],
       itemsdDV: maDVHotTich,
       searchDV: "",
+      snackbar: false,
+      snackbarText: "",
+      snackbarColor: "success",
     };
   },
   methods: {
@@ -560,7 +574,10 @@ export default {
     },
 
     showError() {
-      this.notificationDialog = true; // Mở dialog
+      // this.notificationDialog = true; // Mở dialog
+      // this.snackbarText = 'Thông báo bạn muốn hiển thị';
+      this.snackbarColor = this.isSuccess ? "success" : "error";
+      this.snackbar = true;
     },
 
     getB64Auth(user, password) {
