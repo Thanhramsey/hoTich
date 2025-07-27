@@ -32,7 +32,7 @@ export default {
     return {
       token: "Bearer", // ⚠️ Thay bằng token thực tế
       code: "",
-      maxRetries: 5,
+      maxRetries: 6,
       log: [],
       igateToken: "",
     };
@@ -162,51 +162,55 @@ export default {
       return res.data;
     },
 
-   async waitForTrangThai4(object1) {
-  const maxRetries = this.maxRetries;
+    async waitForTrangThai4(object1) {
+      const maxRetries = this.maxRetries;
 
-  for (let i = 0; i < maxRetries; i++) {
-    this.log.push(`🔁 Đồng bộ lần ${i + 1}...`);
+      for (let i = 0; i < maxRetries; i++) {
+        this.log.push(`🔁 Đồng bộ lần ${i + 1}...`);
 
-    const syncResult = await this.callSyncAPI(object1.code);
+        const syncResult = await this.callSyncAPI(object1.code);
 
-    const checkTrangThai4 = (list) => {
-      return list?.some(item =>
-        item?.result?.value?.some(val => val.trangThai === 4)
-      );
-    };
+        const checkTrangThai4 = (list) => {
+          return list?.some((item) =>
+            item?.result?.value?.some((val) => val.trangThai === 4)
+          );
+        };
 
-    const extractTrangThaiList = (list, label) => {
-      if (!Array.isArray(list)) return;
-      list.forEach(item => {
-        const values = item?.result?.value || [];
-        values.forEach(val => {
-          this.log.push(`📄 [${label}] mã hồ sơ: ${val.maHoSoMCDT || "?"} → trạng thái: ${val.trangThai}`);
-        });
-      });
-    };
+        const extractTrangThaiList = (list, label) => {
+          if (!Array.isArray(list)) return;
+          list.forEach((item) => {
+            const values = item?.result?.value || [];
+            values.forEach((val) => {
+              this.log.push(
+                `📄 [${label}] mã hồ sơ: ${
+                  val.maHoSoMCDT || "?"
+                } → trạng thái: ${val.trangThai}`
+              );
+            });
+          });
+        };
 
-    // 🔍 In các trạng thái đang có ra log
-    extractTrangThaiList(syncResult.List_Suss, "SUCCESS");
-    extractTrangThaiList(syncResult.List_ERR, "ERROR");
+        // 🔍 In các trạng thái đang có ra log
+        extractTrangThaiList(syncResult.List_Suss, "SUCCESS");
+        extractTrangThaiList(syncResult.List_ERR, "ERROR");
 
-    const foundInSuss = checkTrangThai4(syncResult.List_Suss || []);
-    const foundInErr = checkTrangThai4(syncResult.List_ERR || []);
+        const foundInSuss = checkTrangThai4(syncResult.List_Suss || []);
+        const foundInErr = checkTrangThai4(syncResult.List_ERR || []);
 
-    if (foundInSuss || foundInErr) {
-      this.log.push("✅ Đã nhận được trạng thái 4 trong đồng bộ.");
-      return;
-    }
+        if (foundInSuss || foundInErr) {
+          this.log.push("✅ Đã nhận được trạng thái 4 , có file kết quả đồng bộ.");
+          return;
+        }
 
-    if (i === maxRetries - 1) {
-      this.log.push("❌ Đã thử 5 lần nhưng không nhận được trạng thái 4. Hồ sơ có thể chưa ban hành bên hộ tịch hoặc cán bộ nhập tay.");
-    }
+        if (i === maxRetries - 1) {
+          this.log.push(
+            "❌ Đã thử 5 lần nhưng không nhận được trạng thái 4. Hồ sơ có thể chưa ban hành bên hộ tịch hoặc cán bộ nhập tay."
+          );
+        }
 
-    await new Promise((resolve) => setTimeout(resolve, 3000));
-  }
-},
-
-
+        await new Promise((resolve) => setTimeout(resolve, 3000));
+      }
+    },
 
     async runProcess() {
       this.log = [];
@@ -215,49 +219,33 @@ export default {
         const object1 = await this.getObject1();
 
         // 🔍 Lấy danh sách trạng thái log
+        if (!object1.nationCode || object1.nationCode === "") {
+          if(object1.detailEForm.data.loaiHTTP){
+            this.log.push(`🔁 Đồng bộ hồ sơ ${object1.detailEForm.data.loaiHTTP}...`);
+          }else{
+            this.log.push(`🔁 Đồng bộ hồ sơ ...`);
+          }
+          await this.waitForTrangThai4(object1);
+          return;
+        }
+
         const logs = await this.getStatusLog(object1.nationCode);
         const existingStatuses = logs.map((log) => log.requestBody.trangThai);
 
         // ✅ Nếu đã có trạng thái 5 thì kết thúc sớm
         if (existingStatuses.includes(5)) {
           this.log.push(
-            "✔️ Hồ sơ đã có trạng thái 5 → Không cần thực hiện gì thêm."
+            "✔️ Hồ sơ đã có trạng thái 5 → Đã hoàn thành."
           );
+          await this.callSyncAPI(object1.code)
           return;
         }
 
         // ✅ Nếu chưa có trạng thái 5 → xử lý đảm bảo đủ 1, 3, 7
         await this.ensureStatusesFromLogs(logs);
-// 🔁 Bắt đầu vòng lặp chờ trạng thái 4
-        this.log.push("🔁 Bắt đầu gọi API đồng bộ để kiểm tra trạng thái 4...");
-await this.waitForTrangThai4(object1);
-
         // 🔁 Bắt đầu vòng lặp chờ trạng thái 4
-        // for (let i = 0; i < this.maxRetries; i++) {
-        //   this.log.push(`🔁 Lần ${i + 1}: Gọi API lấy kết quả...`);
-        //   const result = await this.callDossierAPI(object1);
-        //   this.log.push("Mã hồ sơ liên thông:", object1.nationCode);
-
-        //   const trangThai = result?.value?.[0]?.trangThai;
-        //   this.log.push(`✅ Trạng thái trả về: ${trangThai}`);
-
-        //   if (trangThai === 4) {
-        //     this.log.push(
-        //       "🎯 Đã nhận trạng thái 4! Gọi API đồng bộ một cửa..."
-        //     );
-        //     const syncResult = await this.callSyncAPI(object1.code);
-        //     this.log.push("✅ API đồng bộ trả về thành công.");
-        //     break;
-        //   }
-
-        //   if (i === this.maxRetries - 1) {
-        //     this.log.push(
-        //       "❌ Đã thử 5 lần nhưng không nhận được trạng thái 4. Có thể chưa ban hành bên hộ tịch hoặc thiếu trạng thái 1,3,7"
-        //     );
-        //   }
-
-        //   await new Promise((resolve) => setTimeout(resolve, 3000));
-        // }
+        this.log.push("🔁 Bắt đầu gọi API đồng bộ để kiểm tra trạng thái 4...");
+        await this.waitForTrangThai4(object1);
       } catch (err) {
         this.log.push(`❌ Lỗi: ${err.response?.data?.message || err.message}`);
       }

@@ -59,9 +59,9 @@ export default {
       tableTitle: "MTP",
       tab: 0,
       items: [
-        { tab: "Get Token", content: "BAOCAO1" },
+        { tab: "Gửi hồ sơ", content: "BAOCAO1" },
         { tab: "DVCLT", content: "BAOCAO6" },
-        { tab: "DVCLT2", content: "DVCLT" },
+        // { tab: "Đồng bộ KQ Hộ tịch", content: "DVCLT" },
         { tab: "Kết thúc hàng loạt", content: "BAOCAO2" },
         { tab: "Tạo object", content: "BAOCAO3" },
         { tab: "Clone quy trình DD", content: "BAOCAO4" },

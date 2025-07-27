@@ -66,6 +66,7 @@
             >
             <v-btn
               @click="fetchData"
+               :disabled="loading"
               style="
                 color: white;
                 font-weight: bold;
@@ -78,11 +79,18 @@
                 font-size: 16px;
                 background-color: rgb(231 13 34) !important;
               "
-              >Get log hồ sơ</v-btn
-            >
+              >Get log hồ sơ
+             <v-progress-circular
+                v-if="loading"
+                indeterminate
+                color="white"
+                size="20"
+                class="ml-2"
+              ></v-progress-circular>  
+            </v-btn>
 
             <v-btn
-              @click="getKetQua"
+              @click="runProcess"
               style="
                 color: white;
                 font-weight: bold;
@@ -95,9 +103,9 @@
                 font-size: 16px;
                 background-color: #28a745 !important;
               "
-              >Lấy kết quả</v-btn
+              >Đồng bộ kết quả</v-btn
             >
-            <v-btn
+            <!-- <v-btn
               @click="checkTrangThai"
               style="
                 color: white;
@@ -112,7 +120,7 @@
                 background-color: #fd7e14 !important;
               "
               >KTTT hồ sơ</v-btn
-            >
+            > -->
             <v-btn
               @click="endHoSo"
               variant="outlined"
@@ -132,7 +140,7 @@
             >
             <v-btn
               @click="resendNhieuHoSo"
-              :disabled="loading"
+              :disabled="loading2"
               variant="outlined"
               style="
                 color: white;
@@ -148,7 +156,7 @@
               "
               >Kéo hso về mcua
               <v-progress-circular
-                v-if="loading"
+                v-if="loading2"
                 indeterminate
                 color="white"
                 size="20"
@@ -205,6 +213,12 @@
           </v-col>
         </v-row>
         <v-row>
+           <p v-if="log.length">
+            <strong>Log:</strong>
+          <ul>
+            <li v-for="(item, index) in log" :key="index">{{ item }}</li>
+          </ul>
+          </p>
           <v-data-table
             :headers="tableHeaders"
             :items="data"
@@ -412,19 +426,21 @@ export default {
       ketQuaNhieu: [],
       ketQua: "",
       loading: false,
+      loading2: false,
       module: "",
       hsoId: "",
       dialog: false,
       dialogLT: false,
       callAgainTextarea: "",
+      maxRetries: 6,
+      log: [],
       tableHeaders: [
         { text: "Dossier Code", value: "dossierCode", align: "start" },
-        { text: "Call Time", value: "callTime", align: "start" },
-        { text: "Request Body", value: "requestBody", align: "start" },
-        { text: "Response Body", value: "responseBody", align: "end" },
-        // { text: "Security Key", value: "securityKey" },
         { text: "Trang Thai", value: "requestBody.trangThai" },
+        { text: "Response Body", value: "responseBody", align: "end" },
+        { text: "Request Body", value: "requestBody", align: "start" },
         { text: "Action", value: "action", sortable: false, align: "end" },
+         { text: "Call Time", value: "callTime", align: "start" },
       ],
       data: [],
       trangThaiHoSo: {},
@@ -451,6 +467,7 @@ export default {
     showError() {
       this.ketQuaDialog = true; // Mở dialog
       this.loading = false;
+      this.loading2 = false;
     },
 
     extractMaHo() {
@@ -567,7 +584,7 @@ export default {
     },
 
     async keoHoSo() {
-      this.loading = true;
+      this.loading2 = true;
       const nationCode = this.maHso.trim();
       if (!nationCode) {
         alert("Vui lòng nhập mã hồ sơ!");
@@ -654,8 +671,7 @@ export default {
       const maHsoTrimmed = this.maHso.trim().replace(/\s+/g, "");
       this.data = [];
 
-      const getHsoIdUrl = `https://apiigate.gialai.gov.vn/ad/api/lienthongDVCLT/getLog?nationCode=${maHsoTrimmed}`;
-
+      const getHsoIdUrl = `https://apiigate.gialai.gov.vn/ad/api/lienthongDVCLT/getLog?api=capNhatTrangThaiHoSoDVCLTHoTich&nationCode=${maHsoTrimmed}`;
       try {
         const response = await axios.get(getHsoIdUrl, {
           headers: {
@@ -773,24 +789,239 @@ export default {
       }
     },
 
-    async getKetQua() {
-      if (this.maHso2 == "") {
-        alert("chưa nhập mã hồ sơ");
+    // async getKetQua() {
+    //   if (this.maHso2 == "") {
+    //     alert("chưa nhập mã hồ sơ");
+    //     return;
+    //   }
+    //   const maHsoTrimmed = this.maHso2.trim().replace(/\s+/g, "");
+    //   const getKetQuaUrl = `https://apiigate.gialai.gov.vn/pa/judicial-civil-status/--sync-dossiers?code=${maHsoTrimmed}`;
+    //   const response = await axios.post(
+    //     getKetQuaUrl,
+    //     {},
+    //     {
+    //       headers: {
+    //         Authorization: `Bearer ${this.igateToken}`, // Đính kèm token vào header
+    //       },
+    //     }
+    //   );
+    //   if (response) {
+    //     alert(response);
+    //   }
+    // },
+
+    async getObject1() {
+      const maHsoTrimmed = this.maHso2.trim().replace(/\s+/g, "");
+      const url = `https://apiigate.gialai.gov.vn/pa/api-integration/--data?code=${maHsoTrimmed}&fields=commonEForm%2CdetailEForm`;
+      const res = await axios.get(url, {
+        headers: { Authorization: `Bearer ${this.igateToken}` },
+      });
+      return res.data;
+    },
+
+    async callDossierAPI(object1) {
+      const url = `https://apiigate.gialai.gov.vn/ad/service/judicial-civil-status/--dossiers`;
+      const body = {
+        eformData: {
+          noiDangKy: object1.detailEForm.data.noiDangKy,
+        },
+        maDinhDanhHoSo: [object1.code],
+        module: object1.detailEForm.data.loaiHTTP,
+        maTinh: "52",
+      };
+
+      const res = await axios.post(url, body, {
+        headers: {
+          Authorization: `Bearer ${this.igateToken}`,
+          "Content-Type": "application/json",
+        },
+      });
+      return res.data;
+    },
+
+    async getStatusLog(nationCode) {
+      const url = `https://apiigate.gialai.gov.vn/ad/api/lienthongDVCLT/getLog?api=capNhatTrangThaiHoSoDVCLTHoTich&nationCode=${nationCode}`;
+      const res = await axios.get(url, {
+        headers: {
+          Authorization: `Bearer ${this.igateToken}`,
+        },
+      });
+      return res.data.content;
+    },
+
+    async updateStatusFromLog(logItem, trangThai, ghiChu) {
+      const body = {
+        ...logItem.requestBody,
+        trangThai: trangThai,
+        ghiChu: ghiChu,
+      };
+
+      const url = `https://apiigate.gialai.gov.vn/integration/api/lienthongDVCLT/capNhatTrangThaiHoSoDVCLTHoTich`;
+      const res = await axios.post(url, body, {
+        headers: {
+          Authorization: `Bearer ${this.igateToken}`,
+          "Content-Type": "application/json",
+        },
+      });
+      return res.data;
+    },
+
+    async ensureStatuses(object1) {
+      const requiredStatuses = {
+        1: "Tiếp nhận hồ sơ vào hệ thống",
+        3: "Hồ sơ đủ điều kiện giải quyết",
+        7: "Đã chuyển cán bộ tư pháp",
+      };
+
+      const logs = await this.getStatusLog(object1.nationCode);
+      const existingStatuses = logs.map((log) => log.requestBody.trangThai);
+
+      // 🔍 Nếu đã có trạng thái 5 thì bỏ qua luôn
+      if (existingStatuses.includes(5)) {
+        this.log.push(
+          "✔️ Đã có trạng thái 5 → Bỏ qua cập nhật trạng thái 1,3,7."
+        );
         return;
       }
-      const maHsoTrimmed = this.maHso2.trim().replace(/\s+/g, "");
-      const getKetQuaUrl = `https://apiigate.gialai.gov.vn/pa/judicial-civil-status/--sync-dossiers?code=${maHsoTrimmed}`;
-      const response = await axios.post(
-        getKetQuaUrl,
-        {},
-        {
-          headers: {
-            Authorization: `Bearer ${this.igateToken}`, // Đính kèm token vào header
-          },
+
+      // ✅ Nếu chưa có 5, thì đảm bảo có đủ 1,3,7
+      for (const [status, ghiChu] of Object.entries(requiredStatuses)) {
+        if (!existingStatuses.includes(Number(status))) {
+          this.log.push(
+            `⚙️ Thiếu trạng thái ${status}, đang gọi API cập nhật...`
+          );
+          const sourceLog = logs[0]; // lấy log đầu tiên làm mẫu
+          await this.updateStatusFromLog(sourceLog, Number(status), ghiChu);
+          this.log.push(`✅ Đã cập nhật trạng thái ${status}`);
+          await new Promise((resolve) => setTimeout(resolve, 1000));
+        } else {
+          this.log.push(`✔️ Đã có trạng thái ${status}`);
         }
-      );
-      if (response) {
-        alert(response);
+      }
+    },
+    async ensureStatusesFromLogs(logs) {
+      const requiredStatuses = {
+        1: "Tiếp nhận hồ sơ vào hệ thống",
+        3: "Hồ sơ đủ điều kiện giải quyết",
+        7: "Đã chuyển cán bộ tư pháp",
+      };
+
+      const existingStatuses = logs.map((log) => log.requestBody.trangThai);
+
+      for (const [status, ghiChu] of Object.entries(requiredStatuses)) {
+        if (!existingStatuses.includes(Number(status))) {
+          this.log.push(
+            `⚙️ Thiếu trạng thái ${status}, đang gọi API cập nhật...`
+          );
+          const sourceLog = logs[0]; // dùng log đầu tiên làm mẫu
+          await this.updateStatusFromLog(sourceLog, Number(status), ghiChu);
+          this.log.push(`✅ Đã cập nhật trạng thái ${status}`);
+          await new Promise((resolve) => setTimeout(resolve, 1000));
+        } else {
+          this.log.push(`✔️ Đã có trạng thái ${status}`);
+        }
+      }
+    },
+
+    async callSyncAPI(code) {
+      const url = `https://apiigate.gialai.gov.vn/pa/judicial-civil-status/--sync-dossiers?new=true&code=${code}&showInputSend=keytest_8957`;
+      const res = await axios.post(url, null, {
+        headers: {
+          Authorization: `Bearer ${this.igateToken}`,
+          "Content-Type": "application/json",
+        },
+      });
+      return res.data;
+    },
+
+    async waitForTrangThai4(object1) {
+      const maxRetries = this.maxRetries;
+
+      for (let i = 0; i < maxRetries; i++) {
+        this.log.push(`🔁 Đồng bộ lần ${i + 1}...`);
+
+        const syncResult = await this.callSyncAPI(object1.code);
+
+        const checkTrangThai4 = (list) => {
+          return list?.some((item) =>
+            item?.result?.value?.some((val) => val.trangThai === 4)
+          );
+        };
+
+        const extractTrangThaiList = (list, label) => {
+          if (!Array.isArray(list)) return;
+          list.forEach((item) => {
+            const values = item?.result?.value || [];
+            values.forEach((val) => {
+              this.log.push(
+                `📄 [${label}] mã hồ sơ: ${
+                  val.maHoSoMCDT || "?"
+                } → trạng thái: ${val.trangThai}`
+              );
+            });
+          });
+        };
+
+        // 🔍 In các trạng thái đang có ra log
+        extractTrangThaiList(syncResult.List_Suss, "SUCCESS");
+        extractTrangThaiList(syncResult.List_ERR, "ERROR");
+
+        const foundInSuss = checkTrangThai4(syncResult.List_Suss || []);
+        const foundInErr = checkTrangThai4(syncResult.List_ERR || []);
+
+        if (foundInSuss || foundInErr) {
+          this.log.push(
+            "✅ Đã nhận được trạng thái 4 , có file kết quả đồng bộ."
+          );
+          return;
+        }
+
+        if (i === maxRetries - 1) {
+          this.log.push(
+            "❌ Đã thử 5 lần nhưng không nhận được trạng thái 4. Hồ sơ có thể chưa ban hành bên hộ tịch hoặc cán bộ nhập tay."
+          );
+        }
+
+        await new Promise((resolve) => setTimeout(resolve, 3000));
+      }
+    },
+
+    async runProcess() {
+      this.log = [];
+      try {
+        this.log.push("🔍 Đang lấy thông tin hồ sơ...");
+        const object1 = await this.getObject1();
+
+        // 🔍 Lấy danh sách trạng thái log
+        if (!object1.nationCode || object1.nationCode === "") {
+          if (object1.detailEForm.data.loaiHTTP) {
+            this.log.push(
+              `🔁 Đồng bộ hồ sơ ${object1.detailEForm.data.loaiHTTP}...`
+            );
+          } else {
+            this.log.push(`🔁 Đồng bộ hồ sơ ...`);
+          }
+          await this.waitForTrangThai4(object1);
+          return;
+        }
+
+        const logs = await this.getStatusLog(object1.nationCode);
+        const existingStatuses = logs.map((log) => log.requestBody.trangThai);
+
+        // ✅ Nếu đã có trạng thái 5 thì kết thúc sớm
+        if (existingStatuses.includes(5)) {
+          this.log.push("✔️ Hồ sơ đã có trạng thái 5 → Đã hoàn thành.");
+          await this.callSyncAPI(object1.code);
+          return;
+        }
+
+        // ✅ Nếu chưa có trạng thái 5 → xử lý đảm bảo đủ 1, 3, 7
+        await this.ensureStatusesFromLogs(logs);
+        // 🔁 Bắt đầu vòng lặp chờ trạng thái 4
+        this.log.push("🔁 Bắt đầu gọi API đồng bộ để kiểm tra trạng thái 4...");
+        await this.waitForTrangThai4(object1);
+      } catch (err) {
+        this.log.push(`❌ Lỗi: ${err.response?.data?.message || err.message}`);
       }
     },
   },
