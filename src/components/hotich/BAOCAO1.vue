@@ -415,6 +415,10 @@
               </v-btn>
             </div>
 
+            <v-row>
+              <textarea ref="editor"></textarea>
+            </v-row>
+
             <p v-if="responseHT" style="color: purple">
               Kết quả trả về từ hộ tịch: {{ responseHT }}
             </p>
@@ -442,6 +446,11 @@ import { jsonToXml } from "./jsonToXml.js";
 import dviJson from "./dviJson.json";
 import noiDangKyJson from "./noiDangKy.json";
 import maDVHotTich from "./maDVHotTich.json";
+import CodeMirror from "codemirror";
+import "codemirror/lib/codemirror.css";
+import "codemirror/mode/javascript/javascript.js";
+import "codemirror/theme/material.css";
+import "codemirror/addon/search/searchcursor.js";
 
 export default {
   components: {},
@@ -523,9 +532,116 @@ export default {
       snackbar: false,
       snackbarText: "",
       snackbarColor: "success",
+      cmInstance: null,
     };
   },
+  mounted() {
+    this.cmInstance = CodeMirror.fromTextArea(this.$refs.editor, {
+      lineNumbers: true,
+      mode: "application/json",
+      theme: "material",
+      tabSize: 2,
+      lineWrapping: true,
+    });
+  },
   methods: {
+    removeVietnameseTones(str) {
+      return str
+        .normalize("NFD")
+        .replace(/[\u0300-\u036f]/g, "")
+        .replace(/đ/g, "d")
+        .replace(/Đ/g, "D");
+    },
+
+    highlightErrors(errorsText) {
+      if (!this.cmInstance || !errorsText) return;
+
+      // Xóa highlight cũ
+      this.errorMarks = this.errorMarks || [];
+      this.errorMarks.forEach((m) => m.clear());
+      this.errorMarks = [];
+
+      const sentences = errorsText
+        .split(/[.\n]+/)
+        .map((s) => s.trim())
+        .filter(Boolean);
+
+      const lookAhead =
+        "(?:co|khong|khong duoc|khong ton tai|khong co|co do dai|co dinh dang|khong dung|khong hop le|khong co thong tin|duoc phep)";
+      const fields = [];
+
+      for (let s of sentences) {
+        const noToneSentence = this.removeVietnameseTones(s);
+        const regex = new RegExp(
+          "([A-Za-z_][A-Za-z0-9_]*)\\s+" + lookAhead,
+          "gi"
+        );
+        let m;
+        while ((m = regex.exec(noToneSentence)) !== null) {
+          if (m[1]) {
+            let token = m[1];
+            // thử bỏ 0-3 ký tự đầu nếu không match
+            for (let cut = 0; cut <= 3; cut++) {
+              let core = token.slice(cut);
+              if (core.length >= 3) {
+                fields.push(core);
+              }
+            }
+          }
+        }
+      }
+      console.log("fields for highlight:", fields);
+      // Loại prefix 'n', 'nc', 'capn'... ra khỏi đầu nếu cần
+      const cleanedFields = fields.map((f) => {
+        return f.replace(/^(n|nc|capn|apn|pn)+/, "");
+      });
+
+      // Loại trùng
+      const uniqueFields = [...new Set(cleanedFields)];
+      console.log("Cleaned unique fields for highlight:", uniqueFields);
+      let firstPos = null;
+
+      uniqueFields.forEach((field) => {
+        const rxKey = new RegExp(
+          '"' + field.replace(/[.*+?^${}()|[\]\\]/g, "\\$&") + '"\\s*:',
+          "g"
+        );
+        let cursor = this.cmInstance.getSearchCursor(rxKey);
+        let found = false;
+        while (cursor.findNext()) {
+          const from = cursor.from(),
+            to = cursor.to();
+          const mark = this.cmInstance.markText(from, to, {
+            className: "cm-error-highlight",
+          });
+          this.errorMarks.push(mark);
+          if (!firstPos) firstPos = from;
+          found = true;
+        }
+
+        if (!found) {
+          const rxEsc = new RegExp(
+            '\\\\"' + field.replace(/[.*+?^${}()|[\]\\]/g, "\\$&") + '\\\\":',
+            "g"
+          );
+          const cursor2 = this.cmInstance.getSearchCursor(rxEsc);
+          while (cursor2.findNext()) {
+            const from = cursor2.from(),
+              to = cursor2.to();
+            const mark = this.cmInstance.markText(from, to, {
+              className: "cm-error-highlight",
+            });
+            this.errorMarks.push(mark);
+            if (!firstPos) firstPos = from;
+          }
+        }
+      });
+
+      if (firstPos) {
+        this.cmInstance.scrollIntoView(firstPos, 100);
+        this.cmInstance.setCursor(firstPos);
+      }
+    },
     copyToClipboard(type) {
       var textarea = "";
       if (type == 1) {
@@ -896,6 +1012,36 @@ export default {
         });
         // this.resultApi2 = JSON.stringify(res2.data, null, 2);
         this.requestBodyString = JSON.stringify(res2.data, null, 2);
+
+        // var res2 = {
+        //   data: {
+        //     title: "Có lỗi xảy ra.",
+        //     errors:
+        //       "cbsSoDDCN có độ dài vượt quá số lượng cho phép. Vui lòng kiểm tra lại thông tin.ncbsLoaiGiayToTuyThan không tồn tại. Vui lòng kiểm tra lại thông tin danh mục theo mô tả trong tài liệu kỹ thuật đã cung cấp.ncbsSoDDCN có định dạng không đúng. Vui lòng kiểm tra lại tài liệu kỹ thuật đã cung cấp.",
+        //     status: 500,
+        //     inputSend: {
+        //       maHoSoMCDT: "H21.129-250812-0035",
+        //       maHoSoLT: "BS",
+        //       data: '{"nycNgayCapGiayToTuyThan":"25/06/2023","nycEmail":"","noiDangKyTruocDay":"23710","nycSoGiayToTuyThan":"034184022854","cbsDanTocKhac":"","nycSoDienThoai":"0366607768","thongTinKhac":"","loaiBanSao":0,"cbsQuocTich":"VN","cbsNgayCapGiayToTuyThan":"22/06/2023","nycLoaiGiayToTuyThan":4,"nycHoTen":{"Ho":"DƯƠNG","ChuDem":"THỊ","Ten":"TUYẾT ANH"},"quyenSoDangKyTruocDay":"2023","cbsNgaySinh":{"namSinh":"2021","thangSinh":"06","ngaySinh":"24"},"cbsNoiCapGiayToTuyThan":"UBND xã Ia Băng, tỉnh Gia Lai","cbsGioiTinh":1,"cbsHoTen":{"Ho":"DƯƠNG","ChuDem":"HOÀNG ","Ten":"PHÚ"},"cbsNoiCuTru":{"dcChiTiet":"Thôn Ia Băng","quocGia":"VN","maTinh":"52","maXa":"23710"},"noiDangKy":"23710","nycNoiCuTru":{"dcChiTiet":"Thôn Hàm Rồng","quocGia":"VN","maTinh":"52","maXa":"23710"},"cbsDanToc":"63001","loaiBSCC":"","cbsSoGiayToTuyThan":"120","cbsLoaiCuTru":1,"ngayDangKyTruocDay":"22/06/2023","cbsLoaiGiayToTuyThan":10,"cbsSoDDCN":"0654221015358","nycNoiCapGiayToTuyThan":"Cục cảnh sát quản lý hành chính về trật tự xã hội","nycQuanHe":"Mẹ","nycLoaiCuTru":1,"soDangKyTruocDay":"120"}',
+        //       module: "BS",
+        //       ngayTiepNhan: "12/08/2025 ",
+        //       maDonVi: "23710",
+        //     },
+        //   },
+        // };
+        this.requestBodyString = JSON.stringify(res2.data, null, 2);
+
+        this.cmInstance.setValue(this.requestBodyString);
+
+        // Xóa highlight cũ nếu có
+        this.cmInstance.getAllMarks().forEach((mark) => mark.clear());
+
+        // Nếu có errors -> highlight
+        if (res2.data.errors) {
+          console.log("data", res2.data.errors);
+          this.highlightErrors(res2.data.errors);
+        }
+
         this.isSuccess = true;
         this.notificationMessage = "Get thông tin hồ sơ thành công";
       } catch (error) {
@@ -1009,7 +1155,7 @@ export default {
 };
 </script>
 
-<style scoped>
+<style >
 textarea {
   width: 100%; /* Chiều rộng 100% của phần tử chứa */
   height: 100px; /* Chiều cao cụ thể */
@@ -1040,5 +1186,19 @@ button {
 
 p {
   color: red;
+}
+
+.cm-s-material .highlight-error {
+  background-color: rgba(255, 0, 0, 0.3);
+  border-bottom: 2px solid red;
+}
+.CodeMirror {
+  height: auto;
+  border: 1px solid #ccc;
+}
+.cm-error-highlight {
+  background-color: yellow;
+  color: red !important;
+  font-weight: bold;
 }
 </style>

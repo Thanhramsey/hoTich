@@ -1,5 +1,8 @@
 module.exports = {
   devServer: {
+    watchOptions: {
+      ignored: ["**/node_modules", "**/C:/DumpStack.log.tmp"],
+    },
     proxy: {
       "/api": {
         target: "https://congdichvu.gialai.gov.vn",

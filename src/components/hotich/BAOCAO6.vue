@@ -213,12 +213,35 @@
           </v-col>
         </v-row>
         <v-row>
+          <v-col cols="4">
            <p v-if="log.length">
             <strong>Log:</strong>
           <ul>
             <li v-for="(item, index) in log" :key="index">{{ item }}</li>
           </ul>
           </p>
+          </v-col>
+           <v-col cols="8">
+           <div style="position: relative">
+          <v-textarea  variant="solo"
+              bg-color="amber-lighten-4"
+              color="orange orange-darken-4"
+              v-model="trangThaiSo4">
+
+          </v-textarea>
+           <v-btn
+              
+                small
+                color="success"
+                style="position: absolute; top: 4px; right: 4px; z-index: 1"
+                 @click="callAgainFunction(false)"
+              >
+                Cập nhật lại
+              </v-btn>
+              </div>
+              </v-col>
+          </v-row>
+          <v-row>
           <v-data-table
             :headers="tableHeaders"
             :items="data"
@@ -274,7 +297,7 @@
             <v-card-actions>
               <v-btn
                 color="primary"
-                @click="callAgainFunction()"
+                @click="callAgainFunction(true)"
                 style="
                   color: white;
                   font-weight: bold;
@@ -440,9 +463,10 @@ export default {
         { text: "Response Body", value: "responseBody", align: "end" },
         { text: "Request Body", value: "requestBody", align: "start" },
         { text: "Action", value: "action", sortable: false, align: "end" },
-         { text: "Call Time", value: "callTime", align: "start" },
+        { text: "Call Time", value: "callTime", align: "start" },
       ],
       data: [],
+      trangThaiSo4: "",
       trangThaiHoSo: {},
       trangThaiHoSoString: "",
       istrangThaiHoSoSuccess: false,
@@ -725,13 +749,19 @@ export default {
       }
     },
 
-    async callAgainFunction() {
+    async callAgainFunction(isDialog) {
       console.log(this.callAgainTextarea);
+      let bodyCall = {};
+      if (isDialog) {
+        bodyCall = this.callAgainTextarea;
+      } else {
+        bodyCall = this.trangThaiSo4;
+      }
       const dayLaiUrl = `https://apiigate.gialai.gov.vn/ad/api/lienthongDVCLT/capNhatTrangThaiHoSoDVCLTHoTich`;
       try {
         const response = await axios.post(
           dayLaiUrl,
-          JSON.parse(this.callAgainTextarea, null, 2),
+          JSON.parse(bodyCall, null, 2),
           {
             headers: {
               Authorization: `Bearer ${this.igateToken}`, // Đính kèm token vào header
@@ -970,6 +1000,21 @@ export default {
         const foundInErr = checkTrangThai4(syncResult.List_ERR || []);
 
         if (foundInSuss || foundInErr) {
+          console.log("syncResult:", syncResult);
+          if (foundInSuss) {
+            this.trangThaiSo4 = JSON.stringify(
+              syncResult.List_Suss[0].result.value[0],
+              null,
+              2
+            );
+          } else if (foundInErr) {
+            this.trangThaiSo4 = JSON.stringify(
+              syncResult.List_ERR[0].result.value[0],
+              null,
+              2
+            );
+          }
+
           this.log.push(
             "✅ Đã nhận được trạng thái 4 , có file kết quả đồng bộ."
           );
