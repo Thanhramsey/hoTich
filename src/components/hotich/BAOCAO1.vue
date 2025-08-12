@@ -396,15 +396,15 @@
             <p v-if="requestBody" style="color: red; display: none">
               Body gửi đi: {{ requestBody }}
             </p>
-            <div style="position: relative">
-              <v-textarea
+            <div style="position: relative" class="my-editor-container">
+              <!-- <v-textarea
                 v-model="requestBodyString"
                 label="Request Body"
                 outlined
                 auto-grow
                 rows="10"
-              ></v-textarea>
-
+              ></v-textarea> -->
+              <textarea ref="editor" v-model="requestBodyString"></textarea>
               <v-btn
                 small
                 color="warning"
@@ -415,9 +415,9 @@
               </v-btn>
             </div>
 
-            <v-row>
+            <!-- <v-row>
               <textarea ref="editor"></textarea>
-            </v-row>
+            </v-row> -->
 
             <p v-if="responseHT" style="color: purple">
               Kết quả trả về từ hộ tịch: {{ responseHT }}
@@ -454,7 +454,19 @@ import "codemirror/addon/search/searchcursor.js";
 
 export default {
   components: {},
-  watch: {},
+  watch: {
+    requestBodyString(newValue) {
+      if (newValue !== this.cmInstance.getValue()) {
+        this.cmInstance.setValue(newValue);
+      }
+    },
+  },
+  props: {
+    value: {
+      type: String,
+      default: "",
+    },
+  },
   computed: {
     iconStyle() {
       return {
@@ -540,8 +552,14 @@ export default {
       lineNumbers: true,
       mode: "application/json",
       theme: "material",
-      tabSize: 2,
+      tabSize: 5,
       lineWrapping: true,
+    });
+    this.cmInstance.setValue(this.requestBodyString);
+    this.cmInstance.on("change", () => {
+      this.requestBodyString = this.cmInstance.getValue();
+      // Phát ra sự kiện input để v-model có thể lắng nghe
+      this.$emit("input", this.requestBodyString);
     });
   },
   methods: {
@@ -561,35 +579,20 @@ export default {
       this.errorMarks.forEach((m) => m.clear());
       this.errorMarks = [];
 
-      const sentences = errorsText
-        .split(/[.\n]+/)
-        .map((s) => s.trim())
-        .filter(Boolean);
+      // Sử dụng match() để lấy tất cả các chuỗi camelCase khớp
+      // và GÁN KẾT QUẢ ĐÓ VÀO BIẾN fields
+      const camelCaseRegex = /\b[a-z]+(?:[A-Z][a-z0-9]*)+\b/g;
+      const fields = errorsText.match(camelCaseRegex) || []; // Gán kết quả vào fields, nếu không tìm thấy thì gán mảng rỗng
 
-      const lookAhead =
-        "(?:co|khong|khong duoc|khong ton tai|khong co|co do dai|co dinh dang|khong dung|khong hop le|khong co thong tin|duoc phep)";
-      const fields = [];
+      // Giờ đây, biến fields đã chứa tất cả các chuỗi camelCase
+      console.log("Các chuỗi camelCase tìm thấy:");
+      console.log(fields);
 
-      for (let s of sentences) {
-        const noToneSentence = this.removeVietnameseTones(s);
-        const regex = new RegExp(
-          "([A-Za-z_][A-Za-z0-9_]*)\\s+" + lookAhead,
-          "gi"
-        );
-        let m;
-        while ((m = regex.exec(noToneSentence)) !== null) {
-          if (m[1]) {
-            let token = m[1];
-            // thử bỏ 0-3 ký tự đầu nếu không match
-            for (let cut = 0; cut <= 3; cut++) {
-              let core = token.slice(cut);
-              if (core.length >= 3) {
-                fields.push(core);
-              }
-            }
-          }
-        }
+      // Xử lý các trường hợp không tìm thấy
+      if (fields.length === 0) {
+        console.log("Không tìm thấy chuỗi camelCase nào.");
       }
+
       console.log("fields for highlight:", fields);
       // Loại prefix 'n', 'nc', 'capn'... ra khỏi đầu nếu cần
       const cleanedFields = fields.map((f) => {
@@ -1029,7 +1032,7 @@ export default {
         //     },
         //   },
         // };
-        this.requestBodyString = JSON.stringify(res2.data, null, 2);
+        // this.requestBodyString = JSON.stringify(res2.data, null, 2);
 
         this.cmInstance.setValue(this.requestBodyString);
 
@@ -1155,48 +1158,22 @@ export default {
 };
 </script>
 
-<style >
-textarea {
-  width: 100%; /* Chiều rộng 100% của phần tử chứa */
-  height: 100px; /* Chiều cao cụ thể */
-  box-sizing: border-box; /* Đảm bảo kích thước bao gồm padding và border */
-  border: 1px solid #bbbbbb !important;
-}
-
-input {
-  width: 100%;
-  padding: 10px;
-  margin: 10px 0;
-  border: 1px solid #bbbbbb !important;
-  border-radius: 4px;
-  box-sizing: border-box;
-  font-size: 16px;
-}
-
-button {
-  width: 150px;
-  padding: 10px;
-  margin: 10px 0;
-  border: 1px solid #bbbbbb !important;
-  border-radius: 4px;
-  box-sizing: border-box;
-  font-size: 16px;
-  background-color: rgb(38, 113, 184) !important;
-}
-
-p {
-  color: red;
-}
-
+<style scoped>
 .cm-s-material .highlight-error {
   background-color: rgba(255, 0, 0, 0.3);
   border-bottom: 2px solid red;
 }
-.CodeMirror {
+
+.my-editor-container :deep(.CodeMirror) {
   height: auto;
   border: 1px solid #ccc;
+  min-height: 200px;
 }
-.cm-error-highlight {
+.my-editor-container :deep(.CodeMirror .CodeMirror-scroll) {
+  min-height: 200px;
+  overflow: hidden !important; /* This is the key line */
+}
+.CodeMirror .cm-error-highlight {
   background-color: yellow;
   color: red !important;
   font-weight: bold;
