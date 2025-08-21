@@ -7,7 +7,7 @@ module.exports = {
         pathRewrite: { '^/api': '' }
       },
       '/igate': {
-        target: 'https://apiigate.gialai.gov.vn',
+        target: 'https://api.vpub.khanhhoa.gov.vn',
         changeOrigin: true,
         pathRewrite: { '^/igate': '' }
       },

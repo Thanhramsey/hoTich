@@ -7,7 +7,6 @@
     "dev": "vue-cli-service serve",
     "build": "vue-cli-service build",
     "prepare": "npm run build",
-
     "test:unit": "vue-cli-service test:unit",
     "docs:prepare": "yarn prepare && rm -rf docs/dist/ && mkdir docs/dist/ && cp -r dist docs/",
     "docs:dev": "vuepress dev docs",
@@ -74,11 +73,10 @@
   "license": "MIT",
   "lint-staged": {
     "*.js": [
-      
       "git add"
     ],
     "*.vue": [
-            "git add"
+      "git add"
     ]
   },
   "main": "dist/vue-xlsx.cjs.js",

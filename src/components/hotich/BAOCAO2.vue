@@ -154,7 +154,7 @@ export default {
 
     async getHsoId(id) {
       const trimmedId = id.trim().replace(/\s+/g, "");
-      const url = `https://apiigate.gialai.gov.vn/pa/dossier/search?page=0&size=1&applicant-organization=&spec=slice&code=${trimmedId}`;
+      const url = `https://api.vpub.khanhhoa.gov.vn/pa/dossier/search?page=0&size=1&applicant-organization=&spec=slice&code=${trimmedId}`;
 
       try {
         const response = await axios.get(url, {
@@ -179,7 +179,7 @@ export default {
 
     async endProcess(hsoId, code) {
       const url =
-        "https://apiigate.gialai.gov.vn/pa/dossier/--force-end-process";
+        "https://api.vpub.khanhhoa.gov.vn/pa/dossier/--force-end-process";
       const requestBody = [
         {
           id: hsoId,

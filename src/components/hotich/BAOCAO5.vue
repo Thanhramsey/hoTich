@@ -183,15 +183,15 @@ export default {
         processingTimeUnit: "d",
         //iD eform
         applicantEForm: {
-          id: "6652e73bd4696e0018acefa4",
-          name: "HCC-GLI-VBDLIS",
+          id: "4eb8059829b56cd34e4eb805",
+          name: "HCC-KHA-VBDLIS (Hai cấp)",
         },
         eForm: null,
         reportTemplate: [],
         //iD thời gian làm việc
         timesheet: {
-          id: "6604f6d5c21257111af17280",
-          name: "Thời gian làm việc hành chính GLI (không được xóa)",
+          id: "63d78b9bee48c32f84775902",
+          name: "Giờ hành chính",
         },
         dynamicVariable: {
           constraintTotalProcessTime: false,
@@ -225,106 +225,58 @@ export default {
 
       capHuyens: [
         {
-          id: "66090d95162cb160f8906385",
-          name: "UBND Huyện Chư Prông",
-          code: "H21.52",
-          tenTat: "chuprong",
+          id: "6412dac4ab3cb7219354a8f6",
+          name: "Ủy ban nhân dân huyện Cam Lâm",
+          code: "H32.31",
+          tenTat: "camlam",
         },
         {
-          id: "6619f691bfe89f70f2596e86",
-          name: "UBND huyện Chư Păh",
-          code: "H21.51",
-          tenTat: "chupah",
+          id: "6412db01ab3cb7219354a9bf",
+          name: "Ủy ban nhân dân huyện Diên Khánh",
+          code: "H32.33",
+          tenTat: "dienkhanh",
         },
         {
           id: "66052492162cb160f89060a6",
-          name: "UBND huyện Chư Pưh",
-          code: "H21.53",
-          tenTat: "chupuh",
+          name: "Ủy ban nhân dân huyện Khánh Sơn",
+          code: "H32.34",
+          tenTat: "khanhdon",
         },
         {
-          id: "6619f691bfe89f70f2596e88",
-          name: "UBND huyện Chư Sê",
-          code: "H21.54",
-          tenTat: "chuse",
+          id: "6412db04ab3cb7219354aa8b",
+          name: "UBND huyện Khánh Vĩnh",
+          code: "H32.35",
+          tenTat: "khanhvinh",
         },
         {
-          id: "6619f691bfe89f70f2596e8e",
-          name: "UBND huyện Ia Grai",
-          code: "H21.58",
-          tenTat: "iagrai",
+          id: "6412db59ab3cb7219354ac80",
+          name: "Ủy ban nhân dân huyện Trường Sa",
+          code: "H32.39",
+          tenTat: "truongsa",
         },
         {
-          id: "6619f691bfe89f70f2596e90",
-          name: "UBND huyện Ia Pa",
-          code: "H21.59",
-          tenTat: "iapa",
+          id: "6412db58ab3cb7219354ac24",
+          name: "UBND huyện Vạn NInh",
+          code: "H32.38",
+          tenTat: "vanninh",
         },
         {
-          id: "6619f692bfe89f70f2596e98",
-          name: "UBND huyện Mang Yang",
-          code: "H21.63",
-          tenTat: "mangyang",
+          id: "6412db00ab3cb7219354a959",
+          name: "Ủy ban nhân dân thành phố Cam Ranh",
+          code: "H32.32",
+          tenTat: "canranh",
         },
         {
-          id: "6619f692bfe89f70f2596e9a",
-          name: "UBND huyện Phú Thiện",
-          code: "H21.64",
-          tenTat: "phuthien",
+          id: "6412db07ab3cb7219354ab7d",
+          name: "Ủy ban nhân dân thành phố Nha Trang",
+          code: "H32.37",
+          tenTat: "nhatrang",
         },
         {
-          id: "6619f691bfe89f70f2596e8c",
-          name: "UBND huyện Đak Pơ",
-          code: "H21.56",
-          tenTat: "dakpo",
-        },
-        {
-          id: "6619f691bfe89f70f2596e8a",
-          name: "UBND huyện Đak Đoa",
-          code: "H21.55",
-          tenTat: "dakdoa",
-        },
-        {
-          id: "6619f17bbfe89f70f2596e82",
-          name: "UBND huyện Đức Cơ",
-          code: "H21.57",
-          tenTat: "ducco",
-        },
-        {
-          id: "6619f692bfe89f70f2596e9e",
-          name: "UBND thị xã An Khê",
-          code: "H21.66",
-          tenTat: "ankhe",
-        },
-        {
-          id: "66174303bfe89f70f2596e15",
-          name: "UBND thị xã Ayun Pa",
-          code: "H21.67",
-          tenTat: "ayunpa",
-        },
-        {
-          id: "6619f692bfe89f70f2596e9c",
-          name: "UBND thành phố Pleiku",
-          code: "H21.65",
-          tenTat: "pleiku",
-        },
-        {
-          id: "6619f691bfe89f70f2596e92",
-          name: "UBND huyện KBang",
-          code: "H21.60",
-          tenTat: "kbang",
-        },
-        {
-          id: "6619f692bfe89f70f2596e96",
-          name: "UBND huyện Krông Pa",
-          code: "H21.62",
-          tenTat: "krongpa",
-        },
-        {
-          id: "6619f692bfe89f70f2596e94",
-          name: "UBND huyện Kông Chro",
-          code: "H21.61",
-          tenTat: "kongchro",
+          id: "6412db05ab3cb7219354aaf4",
+          name: "UBND thị xã Ninh Hòa",
+          code: "H32.36",
+          tenTat: "ninhhoa",
         },
       ],
       selectedBranch: {
@@ -361,9 +313,10 @@ export default {
           let tenTat = shortName.toLowerCase().replace(/\s+/g, "");
           item.tenTat = tenTat;
           item.tenQT =
-            this.selectedBranch.tenTat + "-" + tenTat + "-" + this.name;
+            //this.selectedBranch.tenTat + "-" + tenTat + "-" + this.name;
+            this.name;
           item.maQT =
-            this.code + "-" + this.selectedBranch.tenTat + "-" + tenTat;
+            this.code + "-" + this.selectedBranch.tenTat + "-" + tenTat.replace("chinhánhvănphòngđăngkýđấtđai", "");
         });
 
         console.log(this.filteredCommunes);
@@ -429,7 +382,7 @@ export default {
     async getProcessInfo(processId) {
       try {
         // Gọi API clone quy trình
-        const apiUrl = `https://apiigate.gialai.gov.vn/bpm/process-definition/${processId}`;
+        const apiUrl = `https://api.vpub.khanhhoa.gov.vn/bpm/process-definition/${processId}`;
         this.loading2 = true;
         return axios
           .get(apiUrl, {
@@ -466,7 +419,7 @@ export default {
           // Gọi API clone quy trình
           this.loading2 = true;
           const response = await axios.post(
-            "https://apiigate.gialai.gov.vn/bpm/process-definition/--clone-process",
+            "https://api.vpub.khanhhoa.gov.vn/bpm/process-definition/--clone-process",
             {
               processId: this.processId,
               code: process.maQT,
@@ -488,7 +441,7 @@ export default {
           this.apDungDonViReq.appliedAgency[0].name = process.name;
           this.apDungDonViReq.appliedAgency[0].parent = process.parent;
           const response2 = await axios.put(
-            `https://apiigate.gialai.gov.vn/bpm/process-definition/${this.processCloneId}/--properties`,
+            `https://api.vpub.khanhhoa.gov.vn/bpm/process-definition/${this.processCloneId}/--properties`,
             this.apDungDonViReq,
             {
               headers: {
@@ -518,7 +471,7 @@ export default {
           const taskDefinitionKey = task.id; // Lấy task-definition-key từ từng task
           if (taskDefinitionKey != "root") {
             // Gọi API thứ hai với process-definition-id và task-definition-key
-            const apiUrl = `https://apiigate.gialai.gov.vn/bpm/process-definition-task/--find-by-activiti-task?process-definition-id=${this.processCloneId}&task-definition-key=${taskDefinitionKey}`;
+            const apiUrl = `https://api.vpub.khanhhoa.gov.vn/bpm/process-definition-task/--find-by-activiti-task?process-definition-id=${this.processCloneId}&task-definition-key=${taskDefinitionKey}`;
 
             try {
               const taskResponse = await axios.get(apiUrl, {
@@ -577,6 +530,7 @@ export default {
               const transformedJson = {
                 name: originalJson.name,
                 remind: originalJson.remind,
+                candidatePosition: originalJson.candidatePosition,
                 processingTime: originalJson.processingTime,
                 processingTimeUnit: originalJson.processingTimeUnit,
                 position: null,
@@ -690,7 +644,7 @@ export default {
               console.log("JSON cập nhật:", transformedJson);
 
               const response = await axios.post(
-                "https://apiigate.gialai.gov.vn/bpm/process-definition-task",
+                "https://api.vpub.khanhhoa.gov.vn/bpm/process-definition-task",
                 transformedJson,
                 {
                   headers: {

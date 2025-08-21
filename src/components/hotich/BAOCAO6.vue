@@ -392,7 +392,7 @@ export default {
         alert("Không có thông tin");
       } else {
         const url =
-          "https://apiigate.gialai.gov.vn/pa/dossier/--force-end-process";
+          "https://api.vpub.khanhhoa.gov.vn/pa/dossier/--force-end-process";
         var endRequestBody = [
           {
             id: this.hsoId,
@@ -429,7 +429,7 @@ export default {
 
     async checkTrangThai() {
       const response = await axios.post(
-        "https://apiigate.gialai.gov.vn/ad/service/judicial-civil-status/--dossiers",
+        "https://api.vpub.khanhhoa.gov.vn/ad/service/judicial-civil-status/--dossiers",
         {
           maTinh: "64",
           maDinhDanhHoSo: [this.maHso2],
@@ -453,7 +453,7 @@ export default {
 
     async getHsoId() {
       const maHsoTrimmed = this.maHso2.trim().replace(/\s+/g, "");
-      const getHsoIdUrl = `https://apiigate.gialai.gov.vn/pa/dossier/search?page=0&size=20&applicant-organization=&spec=slice&code=${maHsoTrimmed}`;
+      const getHsoIdUrl = `https://api.vpub.khanhhoa.gov.vn/pa/dossier/search?page=0&size=20&applicant-organization=&spec=slice&code=${maHsoTrimmed}`;
 
       try {
         const getHsId = await axios.get(getHsoIdUrl, {
@@ -484,7 +484,7 @@ export default {
       const maHsoTrimmed = this.maHso.trim().replace(/\s+/g, "");
       this.data = [];
 
-      const getHsoIdUrl = `https://apiigate.gialai.gov.vn/ad/api/lienthongDVCLT/getLog?nationCode=${maHsoTrimmed}`;
+      const getHsoIdUrl = `https://api.vpub.khanhhoa.gov.vn/ad/api/lienthongDVCLT/getLog?nationCode=${maHsoTrimmed}`;
 
       try {
         const response = await axios.get(getHsoIdUrl, {
@@ -541,7 +541,7 @@ export default {
 
     async callAgainFunction() {
       console.log(this.callAgainTextarea);
-      const dayLaiUrl = `https://apiigate.gialai.gov.vn/ad/api/lienthongDVCLT/capNhatTrangThaiHoSoDVCLTHoTich`;
+      const dayLaiUrl = `https://api.vpub.khanhhoa.gov.vn/ad/api/lienthongDVCLT/capNhatTrangThaiHoSoDVCLTHoTich`;
       try {
         const response = await axios.post(
           dayLaiUrl,
@@ -575,7 +575,7 @@ export default {
 
     async handleButtonClick(item) {
       console.log(item);
-      const dayLaiUrl = `https://apiigate.gialai.gov.vn/ad/api/lienthongDVCLT/capNhatTrangThaiHoSoDVCLTHoTich`;
+      const dayLaiUrl = `https://api.vpub.khanhhoa.gov.vn/ad/api/lienthongDVCLT/capNhatTrangThaiHoSoDVCLTHoTich`;
       try {
         const response = await axios.post(dayLaiUrl, item.requestBody, {
           headers: {
@@ -609,7 +609,7 @@ export default {
         return;
       }
       const maHsoTrimmed = this.maHso2.trim().replace(/\s+/g, "");
-      const getKetQuaUrl = `https://apiigate.gialai.gov.vn/pa/judicial-civil-status/--sync-dossiers?code=${maHsoTrimmed}`;
+      const getKetQuaUrl = `https://api.vpub.khanhhoa.gov.vn/pa/judicial-civil-status/--sync-dossiers?code=${maHsoTrimmed}`;
       const response = await axios.post(
         getKetQuaUrl,
         {},

@@ -585,7 +585,7 @@ export default {
 
     async getLTRequest() {
       const maHsoTrimmed = this.maHso.trim().replace(/\s+/g, "");
-      const getLTRequestURL = `https://apiigate.gialai.gov.vn/pa/judicial-civil-status/--send?code=${maHsoTrimmed}&showIntputSendEnable=true`;
+      const getLTRequestURL = `https://api.vpub.khanhhoa.gov.vn/pa/judicial-civil-status/--send?code=${maHsoTrimmed}&showIntputSendEnable=true`;
 
       try {
         const dataLT = await axios.post(
@@ -618,7 +618,7 @@ export default {
 
     async getHsoId() {
       const maHsoTrimmed = this.maHso.trim().replace(/\s+/g, "");
-      const getHsoIdUrl = `https://apiigate.gialai.gov.vn/pa/dossier/search?page=0&size=20&applicant-organization=&spec=slice&code=${maHsoTrimmed}`;
+      const getHsoIdUrl = `https://api.vpub.khanhhoa.gov.vn/pa/dossier/search?page=0&size=20&applicant-organization=&spec=slice&code=${maHsoTrimmed}`;
       this.requestBodyString = "";
       try {
         const getHsId = await axios.get(getHsoIdUrl, {
@@ -647,16 +647,16 @@ export default {
           this.notificationMessage = "Get thông tin hồ sơ thành công";
         } else {
           let agency = getHsId.data.content[0].agency.code;
-          if (agency) {
-            let dvi = this.dViData.content.find((room) => room.code === agency);
-            this.donViNop = dvi.name;
+          // if (agency) {
+          //   let dvi = this.dViData.content.find((room) => room.code === agency);
+          //   this.donViNop = dvi.name;
 
-            var maNoiDangKy = getHsId.data.content[0].eForm.data.noiDangKy;
-            let noiDangKyName = this.noiDangKyJson.find(
-              (data) => data.maDonViHanhChinh === maNoiDangKy
-            );
-            this.noiDangKy = noiDangKyName.tenDonViHanhChinh;
-          }
+          //   var maNoiDangKy = getHsId.data.content[0].eForm.data.noiDangKy;
+          //   let noiDangKyName = this.noiDangKyJson.find(
+          //     (data) => data.maDonViHanhChinh === maNoiDangKy
+          //   );
+          //   this.noiDangKy = noiDangKyName.tenDonViHanhChinh;
+          // }
           this.isSuccess = true;
           this.notificationMessage = "Get thông tin hồ sơ thành công";
           this.showError();
@@ -712,7 +712,7 @@ export default {
         this.showError();
       } else {
         const url =
-          "https://apiigate.gialai.gov.vn/pa/dossier/--force-end-process";
+          "https://api.vpub.khanhhoa.gov.vn/pa/dossier/--force-end-process";
         var endRequestBody = [
           {
             id: this.hsoId,
@@ -748,7 +748,7 @@ export default {
     },
 
     async getData() {
-      const url = `https://apiigate.gialai.gov.vn/pa/dossier/${this.hsoId}/--online`;
+      const url = `https://api.vpub.khanhhoa.gov.vn/pa/dossier/${this.hsoId}/--online`;
       try {
         const response = await axios.get(url, {
           headers: {
@@ -818,7 +818,8 @@ export default {
         this.showError();
       } else {
         var url =
-          "https://congdichvu.gialai.gov.vn:443/hotich/1.0/dangKyHoTich";
+          // "https://congdichvu.gialai.gov.vn:443/hotich/1.0/dangKyHoTich";
+          "http://42.116.171.117:8280/apiLienThongKSKT/1.0/nhanHoSoDKHT";
         var bodySend = JSON.parse(this.requestBodyString); // Chuyển requestBodyString về dạng object
 
         if (
@@ -827,7 +828,7 @@ export default {
           bodySend.module == "LTKH"
         ) {
           url =
-            "https://congdichvu.gialai.gov.vn:443/apiLienThongKSKT/1.0/nhanHoSoDKHT";
+           "http://42.116.171.117:8280/apiLienThongKSKT/1.0/nhanHoSoDKHT";
         }
         console.log(bodySend);
         try {
