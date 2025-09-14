@@ -21,7 +21,9 @@
     "material-design-icons-iconfont": "^6.7.0",
     "proj4": "^2.14.0",
     "regenerator-runtime": "^0.14.1",
+    "shepherd.js": "^14.5.1",
     "vue-router": "^3.6.5",
+    "vue-shepherd": "^5.0.1",
     "vue-xlsx": "^0.2.1",
     "vuetify": "^2.6.13"
   },

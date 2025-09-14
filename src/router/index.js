@@ -5,6 +5,7 @@ import Router from "vue-router";
 import App from "../App.vue";
 import HoTich from "../components/hotich/HoTich.vue";
 import Jira from "../Jira.vue"; // Tính năng riêng biệt
+import GuideDemo from "../components/his/GuideDemo.vue"; // Tính năng riêng biệt
 
 Vue.use(Router);
 
@@ -25,6 +26,11 @@ export default new Router({
       path: "/jira",
       name: "Jira",
       component: Jira,
+    },
+    {
+      path: "/his",
+      name: "his",
+      component: GuideDemo,
     },
   ],
 });

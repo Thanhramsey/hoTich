@@ -105,6 +105,22 @@
               "
               >Đồng bộ kết quả</v-btn
             >
+            <v-btn
+              @click="runProcess2"
+              style="
+                color: white;
+                font-weight: bold;
+                width: auto;
+                padding: 10px;
+                margin: 10px 10px;
+                border: 1px solid #bbbbbb !important;
+                border-radius: 4px;
+                box-sizing: border-box;
+                font-size: 16px;
+                background-color: #28a745 !important;
+              "
+              >ĐB</v-btn
+            >
             <!-- <v-btn
               @click="checkTrangThai"
               style="
@@ -223,13 +239,31 @@
           </v-col>
            <v-col cols="8">
            <div style="position: relative">
-          <v-textarea  variant="solo"
+          <!-- <v-textarea  variant="solo"
               bg-color="amber-lighten-4"
               color="orange orange-darken-4"
               v-model="trangThaiSo4">
 
-          </v-textarea>
-           <v-btn
+          </v-textarea> -->
+           <div style="position: relative" class="my-editor-container">
+              <!-- <v-textarea
+                v-model="requestBodyString"
+                label="Request Body"
+                outlined
+                auto-grow
+                rows="10"
+              ></v-textarea> -->
+              <textarea ref="editor" v-model="trangThaiSo4"></textarea>
+              <v-btn
+                small
+                color="success"
+                style="position: absolute; top: 4px; right: 4px; z-index: 1"
+                @click="callAgainFunction(false)"
+              >
+                 Cập nhật lại
+              </v-btn>
+            </div>
+           <!-- <v-btn
               
                 small
                 color="success"
@@ -237,7 +271,7 @@
                  @click="callAgainFunction(false)"
               >
                 Cập nhật lại
-              </v-btn>
+              </v-btn> -->
               </div>
               </v-col>
           </v-row>
@@ -394,10 +428,21 @@
 
 <script>
 import axios from "axios";
-
+import CodeMirror from "codemirror";
+import "codemirror/lib/codemirror.css";
+import "codemirror/mode/javascript/javascript.js";
+import "codemirror/theme/material.css";
+import "codemirror/addon/search/searchcursor.js";
 export default {
   components: {},
-  watch: {},
+   watch: {
+    trangThaiSo4(newValue) {
+      if (newValue !== this.cmInstance.getValue()) {
+        this.cmInstance.setValue(newValue);
+      }
+    },
+  },
+  
   computed: {
     iconStyle() {
       return {
@@ -472,6 +517,21 @@ export default {
       istrangThaiHoSoSuccess: false,
       trangThaiHienTai: "",
     };
+  },
+   mounted() {
+    this.cmInstance = CodeMirror.fromTextArea(this.$refs.editor, {
+      lineNumbers: true,
+      mode: "application/json",
+      theme: "material",
+      tabSize: 5,
+      lineWrapping: true,
+    });
+    this.cmInstance.setValue(this.trangThaiSo4);
+    this.cmInstance.on("change", () => {
+      this.trangThaiSo4 = this.cmInstance.getValue();
+      // Phát ra sự kiện input để v-model có thể lắng nghe
+      this.$emit("input", this.trangThaiSo4);
+    });
   },
   methods: {
     async fetchData() {
@@ -1030,6 +1090,63 @@ export default {
         await new Promise((resolve) => setTimeout(resolve, 3000));
       }
     },
+
+     async runProcess2() {
+       const object1 = await this.getObject1();
+  
+        const syncResult = await this.callSyncAPI(object1.code);
+
+        const checkTrangThai4 = (list) => {
+          return list?.some((item) =>
+            item?.result?.value?.some((val) => val.trangThai === 4)
+          );
+        };
+
+        const extractTrangThaiList = (list, label) => {
+          if (!Array.isArray(list)) return;
+          list.forEach((item) => {
+            const values = item?.result?.value || [];
+            values.forEach((val) => {
+              this.log.push(
+                `📄 [${label}] mã hồ sơ: ${
+                  val.maHoSoMCDT || "?"
+                } → trạng thái: ${val.trangThai}`
+              );
+            });
+          });
+        };
+
+        // 🔍 In các trạng thái đang có ra log
+        extractTrangThaiList(syncResult.List_Suss, "SUCCESS");
+        extractTrangThaiList(syncResult.List_ERR, "ERROR");
+
+        const foundInSuss = checkTrangThai4(syncResult.List_Suss || []);
+        const foundInErr = checkTrangThai4(syncResult.List_ERR || []);
+
+        if (foundInSuss || foundInErr) {
+          console.log("syncResult:", syncResult);
+          if (foundInSuss) {
+            this.trangThaiSo4 = JSON.stringify(
+              syncResult.List_Suss[0].result.value[0],
+              null,
+              2
+            );
+          } else if (foundInErr) {
+            this.trangThaiSo4 = JSON.stringify(
+              syncResult.List_ERR[0].result.value[0],
+              null,
+              2
+            );
+          }
+          return;
+        }else{
+           this.trangThaiSo4 = JSON.stringify(
+              syncResult,
+              null,
+              2
+            );
+        }
+     },
 
     async runProcess() {
       this.log = [];
