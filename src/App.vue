@@ -31,15 +31,6 @@
       >
         Jira
       </v-btn>
-      <v-btn
-        text
-        class="text-capitalize font-weight-medium vnpt-text"
-        :class="{ 'text-primary': $route.path === '/his' }"
-        @click="$router.push('/his')"
-        style="color: #0057a6; background-color: #ffffff !important"
-      >
-        His
-      </v-btn>
     </v-app-bar>
 
     <v-main>
