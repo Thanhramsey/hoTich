@@ -274,7 +274,7 @@
                 "
               />
               <span v-if="maHso" @click="clearText" class="clear-icon">❌</span> -->
-              <v-col cols="12" md="6" sm="8">
+              <v-col cols="12" md="8" sm="8">
                 <v-text-field
                   label="Mã Hồ sơ"
                   v-model="maHso"
@@ -290,7 +290,7 @@
                   hide-details
                 ></v-checkbox>
               </v-col>
-              <v-col cols="12" md="6" sm="2">
+              <v-col cols="12" md="4" sm="2">
                 <v-icon
                   class="ml-2 cursor-pointer round-icon"
                   @click="extractMaHo"
@@ -311,12 +311,12 @@
                 color: white;
                 font-weight: bold;
                 width: auto;
-                padding: 20px;
+                padding: 10px;
                 margin: 10px 10px 10px 0px;
                 border: 1px solid #bbbbbb !important;
                 border-radius: 4px;
                 box-sizing: border-box;
-                font-size: 16px;
+                font-size: 12px;
                 background-color: rgb(38, 113, 184) !important;
               "
             >
@@ -327,22 +327,23 @@
                 size="20"
                 class="ml-2"
               ></v-progress-circular>
-              Lấy dữ liệu hồ sơ
+              Gửi lại Hộ tịch
             </v-btn>
             <v-btn
               @click="pushHoTich2"
               :disabled="loading"
+              v-show="!true"
               variant="outlined"
               style="
                 color: white;
                 width: auto;
                 font-weight: bold;
-                padding: 20px;
+                padding: 10px;
                 margin: 10px 10px 10px 0px;
                 border: 1px solid #bbbbbb !important;
                 border-radius: 4px;
                 box-sizing: border-box;
-                font-size: 16px;
+                font-size: 12px;
                 background-color: rgb(38 184 50) !important;
               "
             >
@@ -357,16 +358,52 @@
                 color: white;
                 font-weight: bold;
                 width: auto;
-                padding: 20px;
+                padding: 10px;
                 margin: 10px 10px 10px 0px;
                 border: 1px solid #bbbbbb !important;
                 border-radius: 4px;
                 box-sizing: border-box;
-                font-size: 16px;
+                font-size: 12px;
                 background-color: #ce7a58 !important;
               "
               >Kết thúc hồ sơ</v-btn
             >
+            <v-btn
+              @click="syncQuocGia"
+              variant="outlined"
+              style="
+                color: white;
+                width: auto;
+                font-weight: bold;
+                padding: 10px;
+                margin: 10px 10px 10px 0px;
+                border: 1px solid #bbbbbb !important;
+                border-radius: 4px;
+                box-sizing: border-box;
+                font-size: 12px;
+                background-color: orangered !important;
+              "
+            >
+              Đồng bộ QG
+            </v-btn>
+            <v-btn
+              @click="checkPayment"
+              variant="outlined"
+              style="
+                color: white;
+                width: auto;
+                font-weight: bold;
+                padding: 10px;
+                margin: 10px 10px 10px 0px;
+                border: 1px solid #bbbbbb !important;
+                border-radius: 4px;
+                box-sizing: border-box;
+                font-size: 12px;
+                background-color: red !important;
+              "
+            >
+              Đồng bộ thanh toán
+            </v-btn>
             <v-btn
               @click="showDialogDV"
               variant="outlined"
@@ -374,12 +411,12 @@
                 color: white;
                 width: auto;
                 font-weight: bold;
-                padding: 20px;
+                padding: 10px;
                 margin: 10px 0;
                 border: 1px solid #bbbbbb !important;
                 border-radius: 4px;
                 box-sizing: border-box;
-                font-size: 16px;
+                font-size: 10px;
                 background-color: rgb(38, 113, 184) !important;
               "
             >
@@ -870,6 +907,88 @@ export default {
       await this.getHsoId();
       if (this.hsoId) {
         await this.endProcess();
+      }
+    },
+
+    async syncQuocGia() {
+      this.loading = true;
+      const maHsoTrimmed = this.maHso.trim().replace(/\s+/g, "");
+      if (maHsoTrimmed == "") {
+        this.loading = false;
+        this.notificationMessage = "Không có thông tin";
+        this.isSuccess = false;
+        this.showError();
+      } else {
+        const url =
+          "https://apiigate.gialai.gov.vn/pa/re-sync-dossier/--sync-by-code?isLGSPHCM=false";
+        var endRequestBody = [maHsoTrimmed]; // Chuyển requestBodyString về dạng object
+        console.log(this.requestBody);
+        try {
+          const response = await axios.post(url, endRequestBody, {
+            headers: {
+              Authorization: `Bearer ${this.igateToken}`,
+              "Content-Type": "application/json", // Content-Type của body là JSON
+            },
+          });
+          console.log("Response:", response.data);
+
+          this.notificationMessage = "Thành công";
+          this.isSuccess = true;
+        } catch (error) {
+          this.notificationMessage = error.response
+            ? error.response.data
+            : error.message;
+          this.isSuccess = false;
+          console.error(
+            "Error:",
+            error.response ? error.response.data : error.message
+          );
+        } finally {
+          this.loading = false; // Kết thúc hiển thị loader
+          this.showError();
+        }
+      }
+    },
+
+    async checkPayment() {
+      this.loading = true;
+      const maHsoTrimmed = this.maHso.trim().replace(/\s+/g, "");
+      if (maHsoTrimmed == "") {
+        this.loading = false;
+        this.notificationMessage = "Không có thông tin";
+        this.isSuccess = false;
+        this.showError();
+      } else {
+        const url = `https://apiigate.gialai.gov.vn/pa/dossier-payment/--check-dossier-payment?code=${maHsoTrimmed}`;
+
+        try {
+          const response = await axios.post(
+            url,
+            {},
+            {
+              headers: {
+                Authorization: `Bearer ${this.igateToken}`,
+                "Content-Type": "application/json", // Content-Type của body là JSON
+              },
+            }
+          );
+          console.log("Response:", response.data);
+
+          this.notificationMessage = "Thành công";
+          this.isSuccess = true;
+        } catch (error) {
+          this.notificationMessage = error.response
+            ? error.response.data
+            : error.message;
+          this.isSuccess = false;
+          console.error(
+            "Error:",
+            error.response ? error.response.data : error.message
+          );
+        } finally {
+          this.loading = false; // Kết thúc hiển thị loader
+          this.showError();
+        }
       }
     },
 
