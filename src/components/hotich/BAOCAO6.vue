@@ -154,6 +154,7 @@
               "
               >Kết thúc hồ sơ</v-btn
             >
+            
             <v-btn
               @click="resendNhieuHoSo"
               :disabled="loading2"
@@ -178,7 +179,14 @@
                 size="20"
                 class="ml-2"
               ></v-progress-circular
-            ></v-btn>
+            >
+         </v-btn>
+         <v-checkbox
+            v-model="sentFile"
+            label="Gửi kèm file đính kèm"
+            class="mb-0"
+            color="red"
+          ></v-checkbox>
           </v-col>
         </v-row>
         <v-row v-if="istrangThaiHoSoSuccess">
@@ -435,14 +443,14 @@ import "codemirror/theme/material.css";
 import "codemirror/addon/search/searchcursor.js";
 export default {
   components: {},
-   watch: {
+  watch: {
     trangThaiSo4(newValue) {
       if (newValue !== this.cmInstance.getValue()) {
         this.cmInstance.setValue(newValue);
       }
     },
   },
-  
+
   computed: {
     iconStyle() {
       return {
@@ -501,6 +509,7 @@ export default {
       dialogLT: false,
       callAgainTextarea: "",
       maxRetries: 6,
+      sentFile: true,
       log: [],
       tableHeaders: [
         { text: "Dossier Code", value: "dossierCode", align: "start" },
@@ -518,7 +527,7 @@ export default {
       trangThaiHienTai: "",
     };
   },
-   mounted() {
+  mounted() {
     this.cmInstance = CodeMirror.fromTextArea(this.$refs.editor, {
       lineNumbers: true,
       mode: "application/json",
@@ -693,7 +702,7 @@ export default {
         const result = resendResponse.data;
         if (result.status === "success") {
           // alert("Gửi lại thành công!");
-          this.ketQua = "Gửi lại thành công!";
+          this.ketQua = "Gửi lại thành công!" + JSON.stringify(result);
           this.isSuccess = true;
           this.showError();
         } else {
@@ -731,11 +740,34 @@ export default {
             {
               nationCode: ma,
               token: this.igateToken,
+              sentFile: this.sentFile,
             }
           );
+          let maHS = "";
+
+          try {
+            const rr = res.data?.resendResponse;
+            const rr2 = res.data?.message;
+            console.log("rr", rr);
+            console.log("rr2", rr2);
+
+            if (rr && typeof rr === "string" && rr.trim() !== "") {
+              const obj = JSON.parse(rr);
+              console.log("obj", obj);
+              maHS = obj?.InputSend?.data?.maHoSo || null;
+            }
+            if (rr2 && typeof rr2 === "string" && rr2.trim() !== "") {
+              const obj2 = JSON.parse(rr2);
+              console.log("obj2", obj2);
+              maHS = obj2?.code || null;
+            }
+          } catch (e) {
+            maHS = "";
+          }
+          console.log("maHS", maHS);
 
           this.ketQuaNhieu.push({
-            nationCode: ma,
+            nationCode: ma + "-" + maHS,
             status: res.data.status,
             message: res.data.message || "",
           });
@@ -1091,62 +1123,58 @@ export default {
       }
     },
 
-     async runProcess2() {
-       const object1 = await this.getObject1();
-  
-        const syncResult = await this.callSyncAPI(object1.code);
+    async runProcess2() {
+      const object1 = await this.getObject1();
 
-        const checkTrangThai4 = (list) => {
-          return list?.some((item) =>
-            item?.result?.value?.some((val) => val.trangThai === 4)
-          );
-        };
+      const syncResult = await this.callSyncAPI(object1.code);
 
-        const extractTrangThaiList = (list, label) => {
-          if (!Array.isArray(list)) return;
-          list.forEach((item) => {
-            const values = item?.result?.value || [];
-            values.forEach((val) => {
-              this.log.push(
-                `📄 [${label}] mã hồ sơ: ${
-                  val.maHoSoMCDT || "?"
-                } → trạng thái: ${val.trangThai}`
-              );
-            });
+      const checkTrangThai4 = (list) => {
+        return list?.some((item) =>
+          item?.result?.value?.some((val) => val.trangThai === 4)
+        );
+      };
+
+      const extractTrangThaiList = (list, label) => {
+        if (!Array.isArray(list)) return;
+        list.forEach((item) => {
+          const values = item?.result?.value || [];
+          values.forEach((val) => {
+            this.log.push(
+              `📄 [${label}] mã hồ sơ: ${val.maHoSoMCDT || "?"} → trạng thái: ${
+                val.trangThai
+              }`
+            );
           });
-        };
+        });
+      };
 
-        // 🔍 In các trạng thái đang có ra log
-        extractTrangThaiList(syncResult.List_Suss, "SUCCESS");
-        extractTrangThaiList(syncResult.List_ERR, "ERROR");
+      // 🔍 In các trạng thái đang có ra log
+      extractTrangThaiList(syncResult.List_Suss, "SUCCESS");
+      extractTrangThaiList(syncResult.List_ERR, "ERROR");
 
-        const foundInSuss = checkTrangThai4(syncResult.List_Suss || []);
-        const foundInErr = checkTrangThai4(syncResult.List_ERR || []);
+      const foundInSuss = checkTrangThai4(syncResult.List_Suss || []);
+      const foundInErr = checkTrangThai4(syncResult.List_ERR || []);
 
-        if (foundInSuss || foundInErr) {
-          console.log("syncResult:", syncResult);
-          if (foundInSuss) {
-            this.trangThaiSo4 = JSON.stringify(
-              syncResult.List_Suss[0].result.value[0],
-              null,
-              2
-            );
-          } else if (foundInErr) {
-            this.trangThaiSo4 = JSON.stringify(
-              syncResult.List_ERR[0].result.value[0],
-              null,
-              2
-            );
-          }
-          return;
-        }else{
-           this.trangThaiSo4 = JSON.stringify(
-              syncResult,
-              null,
-              2
-            );
+      if (foundInSuss || foundInErr) {
+        console.log("syncResult:", syncResult);
+        if (foundInSuss) {
+          this.trangThaiSo4 = JSON.stringify(
+            syncResult.List_Suss[0].result.value[0],
+            null,
+            2
+          );
+        } else if (foundInErr) {
+          this.trangThaiSo4 = JSON.stringify(
+            syncResult.List_ERR[0].result.value[0],
+            null,
+            2
+          );
         }
-     },
+        return;
+      } else {
+        this.trangThaiSo4 = JSON.stringify(syncResult, null, 2);
+      }
+    },
 
     async runProcess() {
       this.log = [];

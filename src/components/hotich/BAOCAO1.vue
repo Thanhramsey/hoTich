@@ -65,8 +65,8 @@
 
         <section>
           <section class="mb-5">
-            <h2 class="mb-5">Get TT Hồ sơ</h2>
             <v-row>
+              <!--
               <v-col cols="12" xs="12" md="5">
                 <div>
                   <label
@@ -99,7 +99,8 @@
                   ></v-text-field>
                 </div>
               </v-col>
-              <v-col cols="12" xs="12" md="5"
+              -->
+              <v-col cols="12" xs="12" md="10"
                 ><div>
                   <div class="d-flex align-center">
                     <label
@@ -402,7 +403,7 @@
                 background-color: red !important;
               "
             >
-              Đồng bộ thanh toán
+              Check thanh toán
             </v-btn>
             <v-btn
               @click="showDialogDV"
@@ -913,15 +914,27 @@ export default {
     async syncQuocGia() {
       this.loading = true;
       const maHsoTrimmed = this.maHso.trim().replace(/\s+/g, "");
-      if (maHsoTrimmed == "") {
+      if (!this.maHso || this.maHso.trim() === "") {
         this.loading = false;
-        this.notificationMessage = "Không có thông tin";
+        this.notificationMessage = "Không có thông tin mã hồ sơ";
         this.isSuccess = false;
         this.showError();
+        return;
       } else {
+        const endRequestBody = this.maHso
+          .split(/[,;]+/) // tách theo , hoặc ;
+          .map((item) => item.trim()) // trim từng mã
+          .filter((item) => item); // bỏ rỗng
+        if (endRequestBody.length === 0) {
+          this.loading = false;
+          this.notificationMessage = "Danh sách mã hồ sơ không hợp lệ";
+          this.isSuccess = false;
+          this.showError();
+          return;
+        }
         const url =
           "https://apiigate.gialai.gov.vn/pa/re-sync-dossier/--sync-by-code?isLGSPHCM=false";
-        var endRequestBody = [maHsoTrimmed]; // Chuyển requestBodyString về dạng object
+        // var endRequestBody = [maHsoTrimmed]; // Chuyển requestBodyString về dạng object
         console.log(this.requestBody);
         try {
           const response = await axios.post(url, endRequestBody, {
@@ -932,7 +945,7 @@ export default {
           });
           console.log("Response:", response.data);
 
-          this.notificationMessage = "Thành công";
+          this.notificationMessage = `Gửi yêu cầu đồng bộ ${endRequestBody.length} thành công`;
           this.isSuccess = true;
         } catch (error) {
           this.notificationMessage = error.response
@@ -1131,27 +1144,10 @@ export default {
             Authorization: `Bearer ${this.igateToken}`,
             "Content-Type": "application/json", // Content-Type của body là JSON
           },
+          timeout: 30000,
         });
         // this.resultApi2 = JSON.stringify(res2.data, null, 2);
         this.requestBodyString = JSON.stringify(res2.data, null, 2);
-
-        // var res2 = {
-        //   data: {
-        //     title: "Có lỗi xảy ra.",
-        //     errors:
-        //       "cbsSoDDCN có độ dài vượt quá số lượng cho phép. Vui lòng kiểm tra lại thông tin.ncbsLoaiGiayToTuyThan không tồn tại. Vui lòng kiểm tra lại thông tin danh mục theo mô tả trong tài liệu kỹ thuật đã cung cấp.ncbsSoDDCN có định dạng không đúng. Vui lòng kiểm tra lại tài liệu kỹ thuật đã cung cấp.",
-        //     status: 500,
-        //     inputSend: {
-        //       maHoSoMCDT: "H21.129-250812-0035",
-        //       maHoSoLT: "BS",
-        //       data: '{"nycNgayCapGiayToTuyThan":"25/06/2023","nycEmail":"","noiDangKyTruocDay":"23710","nycSoGiayToTuyThan":"034184022854","cbsDanTocKhac":"","nycSoDienThoai":"0366607768","thongTinKhac":"","loaiBanSao":0,"cbsQuocTich":"VN","cbsNgayCapGiayToTuyThan":"22/06/2023","nycLoaiGiayToTuyThan":4,"nycHoTen":{"Ho":"DƯƠNG","ChuDem":"THỊ","Ten":"TUYẾT ANH"},"quyenSoDangKyTruocDay":"2023","cbsNgaySinh":{"namSinh":"2021","thangSinh":"06","ngaySinh":"24"},"cbsNoiCapGiayToTuyThan":"UBND xã Ia Băng, tỉnh Gia Lai","cbsGioiTinh":1,"cbsHoTen":{"Ho":"DƯƠNG","ChuDem":"HOÀNG ","Ten":"PHÚ"},"cbsNoiCuTru":{"dcChiTiet":"Thôn Ia Băng","quocGia":"VN","maTinh":"52","maXa":"23710"},"noiDangKy":"23710","nycNoiCuTru":{"dcChiTiet":"Thôn Hàm Rồng","quocGia":"VN","maTinh":"52","maXa":"23710"},"cbsDanToc":"63001","loaiBSCC":"","cbsSoGiayToTuyThan":"120","cbsLoaiCuTru":1,"ngayDangKyTruocDay":"22/06/2023","cbsLoaiGiayToTuyThan":10,"cbsSoDDCN":"0654221015358","nycNoiCapGiayToTuyThan":"Cục cảnh sát quản lý hành chính về trật tự xã hội","nycQuanHe":"Mẹ","nycLoaiCuTru":1,"soDangKyTruocDay":"120"}',
-        //       module: "BS",
-        //       ngayTiepNhan: "12/08/2025 ",
-        //       maDonVi: "23710",
-        //     },
-        //   },
-        // };
-        // this.requestBodyString = JSON.stringify(res2.data, null, 2);
 
         this.cmInstance.setValue(this.requestBodyString);
 
@@ -1169,7 +1165,10 @@ export default {
       } catch (error) {
         this.isSuccess = false;
         this.notificationMessage = "Get thông tin hồ sơ không thành công";
-        if (error.response) {
+        if (error.code === "ECONNABORTED") {
+          this.notificationMessage =
+            "Hệ thống phản hồi chậm (quá 60 giây). Vui lòng thử lại sau.";
+        } else if (error.response) {
           console.error("Dữ liệu phản hồi lỗi:", error.response.data);
           console.error("Trạng thái phản hồi lỗi:", error.response.status);
         } else if (error.request) {
