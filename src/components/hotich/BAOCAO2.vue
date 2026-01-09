@@ -57,6 +57,24 @@
         Process Hồ sơ
       </v-btn>
 
+      <v-btn
+        @click="processLLTP"
+        style="
+          color: white;
+          font-weight: bold;
+          width: 250px;
+          padding: 10px;
+          margin: 10px 0;
+          border: 1px solid #bbbbbb !important;
+          border-radius: 4px;
+          box-sizing: border-box;
+          font-size: 16px;
+          background-color: rgb(0, 150, 136) !important;
+        "
+      >
+        Đồng bộ LLTP
+      </v-btn>
+
       <!-- Processed Addresses Table -->
       <v-data-table
         v-if="processedAddresses.length > 0"
@@ -123,6 +141,78 @@ export default {
       reader.readAsArrayBuffer(this.file);
     },
 
+    async processLLTP() {
+      if (!this.file) return;
+
+      const reader = new FileReader();
+
+      reader.onload = async (e) => {
+        const data = new Uint8Array(e.target.result);
+        const workbook = XLSX.read(data, { type: "array" });
+        const sheetName = workbook.SheetNames[0];
+        const sheet = workbook.Sheets[sheetName];
+        const json = XLSX.utils.sheet_to_json(sheet, { header: 1 });
+
+        // Clear existing addresses and processed data
+        this.addresses = [];
+        this.processedAddresses = [];
+
+        json.forEach((row, index) => {
+          if (index > 0) {
+            this.addresses.push(row[1]); // Assuming column 2 is the address
+          }
+        });
+        console.log("this.addresses:", this.addresses);
+
+        this.totalAddresses = this.addresses.length;
+        await this.processlltp2();
+      };
+
+      reader.readAsArrayBuffer(this.file);
+    },
+
+    async processlltp2() {
+      for (let i = 0; i < this.addresses.length; i++) {
+        const address = this.addresses[i];
+        const coordinates = await this.syncLLTP(address);
+        this.processedAddresses.push({
+          address,
+          coordinates,
+        });
+
+        // Update progress
+        this.progress = Math.round(((i + 1) / this.totalAddresses) * 100);
+      }
+
+      this.downloadProcessedFile(); // Call method to download the file
+    },
+
+    async syncLLTP(code) {
+      const trimmedCode = code.trim().replace(/\s+/g, "");
+      const url = `https://apiigate.gialai.gov.vn/pa/v2/lyLichTuPhap/--sync-dossiers?code=${trimmedCode}`;
+
+      try {
+        const response = await axios.post(
+          url,
+          {},
+          {
+            headers: {
+              Authorization: `Bearer ${this.igateToken}`,
+            },
+          }
+        );
+
+        console.log("Đồng bộ LLTP thành công:", response.data);
+        return response.data;
+      } catch (error) {
+        console.error(
+          "Lỗi đồng bộ LLTP:",
+          error.response?.data || error.message
+        );
+        return "Thất bại";
+      }
+    },
+
     async processAddresses() {
       for (let i = 0; i < this.addresses.length; i++) {
         const address = this.addresses[i];
@@ -136,7 +226,7 @@ export default {
         this.progress = Math.round(((i + 1) / this.totalAddresses) * 100);
       }
 
-      this.downloadProcessedFile(); // Call method to download the file
+      this.downloadProcessedFile2(); // Call method to download the file
     },
 
     async endHoSo(id) {
@@ -297,6 +387,24 @@ export default {
       XLSX.utils.book_append_sheet(wb, ws, "Processed Addresses");
 
       XLSX.writeFile(wb, "Processed_Addresses.xlsx");
+    },
+
+    downloadProcessedFile2() {
+      const wsData = [
+        ["STT", "Mã hồ sơ", "Kết quả", "Thông báo"],
+        ...this.processedAddresses.map((item, index) => [
+          index + 1,
+          item.address,
+          item.coordinates?.success ? "Thành công" : "Thất bại",
+          item.coordinates?.message ?? "",
+        ]),
+      ];
+
+      const ws = XLSX.utils.aoa_to_sheet(wsData);
+      const wb = XLSX.utils.book_new();
+      XLSX.utils.book_append_sheet(wb, ws, "LLTP");
+
+      XLSX.writeFile(wb, "Dong_bo_LLTP.xlsx");
     },
   },
 };

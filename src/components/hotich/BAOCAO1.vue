@@ -7,42 +7,6 @@
             <h2 class="mb-5">Get Token(Dùng ở local)</h2>
           </section>
           <hr class="mb-5" />
-          <div>
-            <label for="username">Username:</label>
-            <input
-              type="text"
-              id="username"
-              v-model="username"
-              required
-              style="
-                width: 100%;
-                padding: 10px;
-                margin: 10px 0;
-                border: 1px solid #bbbbbb !important;
-                border-radius: 4px;
-                box-sizing: border-box;
-                font-size: 16px;
-              "
-            />
-          </div>
-          <div>
-            <label for="password">Password:</label>
-            <input
-              type="password"
-              id="password"
-              v-model="password"
-              required
-              style="
-                width: 100%;
-                padding: 10px;
-                margin: 10px 0;
-                border: 1px solid #bbbbbb !important;
-                border-radius: 4px;
-                box-sizing: border-box;
-                font-size: 16px;
-              "
-            />
-          </div>
           <button
             @click="getToken"
             style="
@@ -100,6 +64,42 @@
                 </div>
               </v-col>
               -->
+              <div>
+                <label for="username"><b>Username:</b></label>
+                <input
+                  type="text"
+                  id="username"
+                  v-model="username"
+                  required
+                  style="
+                    width: 100%;
+                    padding: 10px;
+                    margin: 10px 0;
+                    border: 1px solid #bbbbbb !important;
+                    border-radius: 4px;
+                    box-sizing: border-box;
+                    font-size: 16px;
+                  "
+                />
+              </div>
+              <div>
+                <label for="password"><b>Password:</b></label>
+                <input
+                  type="password"
+                  id="password"
+                  v-model="password"
+                  required
+                  style="
+                    width: 100%;
+                    padding: 10px;
+                    margin: 10px 10px;
+                    border: 1px solid #bbbbbb !important;
+                    border-radius: 4px;
+                    box-sizing: border-box;
+                    font-size: 16px;
+                  "
+                />
+              </div>
               <v-col cols="12" xs="12" md="10"
                 ><div>
                   <div class="d-flex align-center">
@@ -755,26 +755,36 @@ export default {
     async getToken() {
       try {
         const response = await axios.post(
-          "https://wsms.gialai.vnpt.vn/wsms/api/igate/login-lgsp-gli",
+          "https://wsms.gialai.vnpt.vn/wsms/api/igate/login-igate",
           // "http://localhost:8087/wsms_war/api/igate/login-lgsp-gli",
           null,
           {
             headers: {},
           }
         );
-        console.log("Token:", response.data);
+        // console.log("Token:", response.data);
         this.token = response.data.access_token;
         this.lgspaccesstoken = response.data.lgspaccesstoken;
 
+        // const response2 = await axios.post(
+        //   "https://wsms.gialai.vnpt.vn/wsms/api/igate/login-igate",
+        //   null,
+        //   {
+        //     headers: {},
+        //   }
+        // );
         const response2 = await axios.post(
-          "https://wsms.gialai.vnpt.vn/wsms/api/igate/login-igate",
-          null,
+          "https://apiigate.gialai.gov.vn/pa/v2/getToken",
+          {
+            username: this.username,
+            password: this.password,
+          },
           {
             headers: {},
           }
         );
-        console.log("Token:", response2.data);
-        this.igateToken = response2.data.access_token;
+        // console.log("Token:", response2.data);
+        this.igateToken = response2.data.accessToken;
       } catch (error) {
         if (error.response) {
           console.error("Dữ liệu phản hồi lỗi:", error.response.data);
@@ -1144,7 +1154,7 @@ export default {
             Authorization: `Bearer ${this.igateToken}`,
             "Content-Type": "application/json", // Content-Type của body là JSON
           },
-          timeout: 30000,
+          // timeout: 30000,
         });
         // this.resultApi2 = JSON.stringify(res2.data, null, 2);
         this.requestBodyString = JSON.stringify(res2.data, null, 2);
