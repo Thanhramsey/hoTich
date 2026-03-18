@@ -218,6 +218,68 @@
                     </v-card>
                   </v-dialog>
 
+                  <v-dialog
+                    v-model="dateDialog"
+                    class="custom-dialog"
+                    persistent
+                    max-width="70%"
+                    :style="imageStyle"
+                  >
+                    <v-card>
+                      <v-card-title class="headline" style="margin-bottom: 30px"
+                        >Cập nhật ngày hẹn/hạn<v-icon
+                          :style="closeIconStyle"
+                          @click="dateDialog = false"
+                        >
+                          mdi-close
+                        </v-icon></v-card-title
+                      >
+                      <v-card-text>
+                        <v-text-field
+                          v-model="updateDateForm.maHso"
+                          label="Mã hồ sơ"
+                          outlined
+                          dense
+                        ></v-text-field>
+
+                        <p
+                          v-if="oldAppointmentDate"
+                          style="color: red; font-weight: bold"
+                        >
+                          Ngày hẹn hiện tại: {{ oldAppointmentDate }}
+                        </p>
+
+                        <v-text-field
+                          v-model="updateDateForm.selectedDateTime"
+                          label="Chọn Ngày & Giờ mới"
+                          type="datetime-local"
+                          outlined
+                          dense
+                        ></v-text-field>
+                      </v-card-text>
+                      <v-card-actions>
+                        <v-spacer></v-spacer>
+                        <v-btn
+                          color="orange"
+                          dark
+                          @click="checkOldDate"
+                          :loading="loading"
+                          >Check ngày kết thúc</v-btn
+                        >
+
+                        <v-btn
+                          color="primary"
+                          :loading="loading"
+                          @click="handleUpdateDate"
+                          >Cập nhật</v-btn
+                        >
+                        <v-btn color="grey" text @click="closeDateDialog"
+                          >Đóng</v-btn
+                        >
+                      </v-card-actions>
+                    </v-card>
+                  </v-dialog>
+
                   <v-textarea
                     class="textarea"
                     type="text"
@@ -388,6 +450,25 @@
               Đồng bộ QG
             </v-btn>
             <v-btn
+              @click="openDateDialog"
+              variant="outlined"
+              style="
+                color: white;
+                font-weight: bold;
+                width: auto;
+                padding: 10px;
+                margin: 10px 10px 10px 0px;
+                border: 1px solid #bbbbbb !important;
+                border-radius: 4px;
+                box-sizing: border-box;
+                font-size: 12px;
+                background-color: #4caf50 !important;
+              "
+            >
+              Cập nhật ngày
+            </v-btn>
+
+            <v-btn
               @click="checkPayment"
               variant="outlined"
               style="
@@ -551,6 +632,13 @@ export default {
       hsoId: "",
       igateToken: "",
       eformData: "",
+      dateDialog: false,
+      oldAppointmentDate: null, // Lưu ngày lấy từ API check
+      isChecked: false, // Đánh dấu đã nhấn nút Check chưa
+      updateDateForm: {
+        maHso: "",
+        selectedDateTime: "",
+      },
       requestBody: {
         maDonVi: "",
         module: "",
@@ -645,7 +733,7 @@ export default {
       uniqueFields.forEach((field) => {
         const rxKey = new RegExp(
           '"' + field.replace(/[.*+?^${}()|[\]\\]/g, "\\$&") + '"\\s*:',
-          "g"
+          "g",
         );
         let cursor = this.cmInstance.getSearchCursor(rxKey);
         let found = false;
@@ -663,7 +751,7 @@ export default {
         if (!found) {
           const rxEsc = new RegExp(
             '\\\\"' + field.replace(/[.*+?^${}()|[\]\\]/g, "\\$&") + '\\\\":',
-            "g"
+            "g",
           );
           const cursor2 = this.cmInstance.getSearchCursor(rxEsc);
           while (cursor2.findNext()) {
@@ -712,7 +800,7 @@ export default {
 
     extractMaHo() {
       const match = this.maHso.match(
-        /H21\.\d{3}-\d{6}-\d{4}|G22\.\d{2}\.\d{2}-\d{6}-\d{4}/
+        /H21\.\d{3}-\d{6}-\d{4}|G22\.\d{2}\.\d{2}-\d{6}-\d{4}/,
       );
       if (match) {
         this.maHso = match[0];
@@ -760,7 +848,7 @@ export default {
           null,
           {
             headers: {},
-          }
+          },
         );
         // console.log("Token:", response.data);
         this.token = response.data.access_token;
@@ -781,7 +869,7 @@ export default {
           },
           {
             headers: {},
-          }
+          },
         );
         // console.log("Token:", response2.data);
         this.igateToken = response2.data.accessToken;
@@ -813,7 +901,7 @@ export default {
             headers: {
               Authorization: `Bearer ${this.igateToken}`, // Đính kèm token vào header
             },
-          }
+          },
         );
         console.log("content LT:", dataLT);
         this.ltRequest = dataLT.data.input;
@@ -853,7 +941,7 @@ export default {
 
         console.log(
           " getHsId.data.content[0].eForm.data.loaiHTTP",
-          getHsId.data.content[0].eForm.data.loaiHTTP
+          getHsId.data.content[0].eForm.data.loaiHTTP,
         );
         if (
           getHsId.data.content[0].eForm.data.loaiHTTP == "LTKS" ||
@@ -871,7 +959,7 @@ export default {
 
             var maNoiDangKy = getHsId.data.content[0].eForm.data.noiDangKy;
             let noiDangKyName = this.noiDangKyJson.find(
-              (data) => data.maDonViHanhChinh === maNoiDangKy
+              (data) => data.maDonViHanhChinh === maNoiDangKy,
             );
             this.noiDangKy = noiDangKyName.tenDonViHanhChinh;
           }
@@ -964,7 +1052,7 @@ export default {
           this.isSuccess = false;
           console.error(
             "Error:",
-            error.response ? error.response.data : error.message
+            error.response ? error.response.data : error.message,
           );
         } finally {
           this.loading = false; // Kết thúc hiển thị loader
@@ -993,7 +1081,7 @@ export default {
                 Authorization: `Bearer ${this.igateToken}`,
                 "Content-Type": "application/json", // Content-Type của body là JSON
               },
-            }
+            },
           );
           console.log("Response:", response.data);
 
@@ -1006,7 +1094,7 @@ export default {
           this.isSuccess = false;
           console.error(
             "Error:",
-            error.response ? error.response.data : error.message
+            error.response ? error.response.data : error.message,
           );
         } finally {
           this.loading = false; // Kết thúc hiển thị loader
@@ -1050,7 +1138,7 @@ export default {
           this.isSuccess = false;
           console.error(
             "Error:",
-            error.response ? error.response.data : error.message
+            error.response ? error.response.data : error.message,
           );
         } finally {
           this.loading = false; // Kết thúc hiển thị loader
@@ -1226,8 +1314,105 @@ export default {
         this.isSuccess = false;
         console.error(
           "Error:",
-          error.response ? error.response.data : error.message
+          error.response ? error.response.data : error.message,
         );
+      } finally {
+        this.loading = false;
+        this.showError();
+      }
+    },
+
+    openDateDialog() {
+      this.updateDateForm.maHso = this.maHso; // Tự động lấy mã hồ sơ đang có ở ngoài nếu có
+      this.dateDialog = true;
+    },
+    closeDateDialog() {
+      this.dateDialog = false;
+      this.oldAppointmentDate = null;
+      this.isChecked = false;
+    },
+    async findDossierInfo(maHso) {
+      const maHsoTrimmed = maHso.trim().replace(/\s+/g, "");
+      const searchUrl = `https://apiigate.gialai.gov.vn/pa/dossier/search?page=0&size=20&applicant-organization=&spec=slice&code=${maHsoTrimmed}`;
+
+      const res = await axios.get(searchUrl, {
+        headers: { Authorization: `Bearer ${this.igateToken}` },
+      });
+
+      if (res.data.content && res.data.content.length > 0) {
+        return res.data.content[0];
+      }
+      return null;
+    },
+    async checkOldDate() {
+      if (!this.updateDateForm.maHso) return alert("Vui lòng nhập mã hồ sơ");
+
+      this.loading = true;
+      try {
+        const dossier = await this.findDossierInfo(this.updateDateForm.maHso);
+        if (dossier) {
+          this.oldAppointmentDate = dossier.appointmentDate;
+          this.isChecked = true; // Đánh dấu đã check
+          this.isSuccess = true;
+          this.notificationMessage = "Đã lấy được ngày hiện tại";
+        } else {
+          alert("Không tìm thấy hồ sơ");
+        }
+      } catch (error) {
+        console.error(error);
+        this.notificationMessage = "Lỗi khi check ngày";
+      } finally {
+        this.loading = false;
+        this.showError();
+      }
+    },
+    // Logic nút "Cập nhật"
+    async handleUpdateDate() {
+      if (!this.updateDateForm.maHso || !this.updateDateForm.selectedDateTime) {
+        return alert("Vui lòng nhập đủ mã hồ sơ và ngày mới");
+      }
+
+      this.loading = true;
+      try {
+        let hsoId = "";
+
+        // Nếu chưa check thì phải gọi search để lấy ID
+        // Nếu đã check rồi thì thực tế vẫn nên gọi lại hoặc lấy từ biến tạm để đảm bảo ID chính xác
+        const dossier = await this.findDossierInfo(this.updateDateForm.maHso);
+
+        if (!dossier) {
+          alert("Không tìm thấy hồ sơ để cập nhật");
+          this.loading = false;
+          return;
+        }
+
+        hsoId = dossier.id;
+        const formattedDate = new Date(
+          this.updateDateForm.selectedDateTime,
+        ).toISOString();
+
+        const updateUrl = "https://apiigate.gialai.gov.vn/pa/dossier/--date";
+        const body = [
+          {
+            id: hsoId,
+            appointmentDate: formattedDate,
+            dueDate: formattedDate,
+          },
+        ];
+
+        await axios.put(updateUrl, body, {
+          headers: {
+            Authorization: `Bearer ${this.igateToken}`,
+            "Content-Type": "application/json",
+          },
+        });
+
+        this.isSuccess = true;
+        this.notificationMessage = "Cập nhật thành công!";
+        this.closeDateDialog(); // Xong thì đóng và reset
+      } catch (error) {
+        this.isSuccess = false;
+        this.notificationMessage = "Lỗi khi cập nhật";
       } finally {
         this.loading = false;
         this.showError();
@@ -1274,7 +1459,7 @@ export default {
           this.isSuccess = false;
           console.error(
             "Error:",
-            error.response ? error.response.data : error.message
+            error.response ? error.response.data : error.message,
           );
         } finally {
           this.loading = false; // Kết thúc hiển thị loader
