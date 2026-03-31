@@ -64,7 +64,7 @@
                 </div>
               </v-col>
               -->
-              <div>
+              <!-- <div>
                 <label for="username"><b>Username:</b></label>
                 <input
                   type="text"
@@ -99,7 +99,7 @@
                     font-size: 16px;
                   "
                 />
-              </div>
+              </div> -->
               <v-col cols="12" xs="12" md="10"
                 ><div>
                   <div class="d-flex align-center">
@@ -637,7 +637,8 @@ export default {
       isChecked: false, // Đánh dấu đã nhấn nút Check chưa
       updateDateForm: {
         maHso: "",
-        selectedDateTime: "",
+        date: new Date().toISOString().substr(0, 10), // Mặc định ngày hiện tại (YYYY-MM-DD)
+        time: "09:00", // Mặc định giờ
       },
       requestBody: {
         maDonVi: "",
@@ -843,7 +844,7 @@ export default {
     async getToken() {
       try {
         const response = await axios.post(
-          "https://wsms.gialai.vnpt.vn/wsms/api/igate/login-igate",
+          "https://wsms.vnptgialai.vn/wsms/api/igate/login-igate",
           // "http://localhost:8087/wsms_war/api/igate/login-lgsp-gli",
           null,
           {
@@ -854,25 +855,25 @@ export default {
         this.token = response.data.access_token;
         this.lgspaccesstoken = response.data.lgspaccesstoken;
 
-        // const response2 = await axios.post(
-        //   "https://wsms.gialai.vnpt.vn/wsms/api/igate/login-igate",
-        //   null,
-        //   {
-        //     headers: {},
-        //   }
-        // );
         const response2 = await axios.post(
-          "https://apiigate.gialai.gov.vn/pa/v2/getToken",
-          {
-            username: this.username,
-            password: this.password,
-          },
+          "https://wsms.vnptgialai.vn/wsms/api/igate/login-igate",
+          null,
           {
             headers: {},
           },
         );
-        // console.log("Token:", response2.data);
-        this.igateToken = response2.data.accessToken;
+        // const response2 = await axios.post(
+        //   "https://apiigate.gialai.gov.vn/pa/v2/getToken",
+        //   {
+        //     username: this.username,
+        //     password: this.password,
+        //   },
+        //   {
+        //     headers: {},
+        //   },
+        // );
+        console.log("Token:", response2.data);
+        this.igateToken = response2.data.access_token;
       } catch (error) {
         if (error.response) {
           console.error("Dữ liệu phản hồi lỗi:", error.response.data);
@@ -1290,7 +1291,7 @@ export default {
         return;
       }
 
-      const url = "https://wsms.gialai.vnpt.vn/wsms/api/igate/push-ho-tich"; // Gọi API nội bộ
+      const url = "https://wsms.vnptgialai.vn/wsms/api/igate/push-ho-tich"; // Gọi API nội bộ
       // const url = "http://localhost:8087/wsms_war/api/igate/push-ho-tich"; // Gọi API nội
       const bodySend = JSON.parse(this.requestBodyString);
 

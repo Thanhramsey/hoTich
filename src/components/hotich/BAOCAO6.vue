@@ -690,8 +690,8 @@ export default {
 
       try {
         const resendResponse = await axios.post(
-          // "https://wsms.gialai.vnpt.vn/wsms/api/igate/resend-one",
-          "https://wsms.gialai.vnpt.vn/wsms/api/igate/resend-one",
+          // "https://wsms.vnptgialai.vn/wsms/api/igate/resend-one",
+          "https://wsms.vnptgialai.vn/wsms/api/igate/resend-one",
           {
             nationCode,
             token: this.igateToken,
@@ -736,7 +736,7 @@ export default {
       for (let ma of rawList) {
         try {
           const res = await axios.post(
-            "https://wsms.gialai.vnpt.vn/wsms/api/igate/resend-one",
+            "https://wsms.vnptgialai.vn/wsms/api/igate/resend-one",
             {
               nationCode: ma,
               token: this.igateToken,
