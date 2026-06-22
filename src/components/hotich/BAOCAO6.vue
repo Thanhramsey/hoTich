@@ -264,8 +264,16 @@
               <textarea ref="editor" v-model="trangThaiSo4"></textarea>
               <v-btn
                 small
+                color="primary"
+                style="position: absolute; top: 4px; right: 180px; z-index: 1"
+                @click="normalizeTrangThaiSo4"
+              >
+                 Chuẩn hoá body
+              </v-btn>
+              <v-btn
+                small
                 color="success"
-                style="position: absolute; top: 4px; right: 4px; z-index: 1"
+                style="position: absolute; top: 4px; right: 24px; z-index: 1"
                 @click="callAgainFunction(false)"
               >
                  Cập nhật lại
@@ -564,14 +572,25 @@ export default {
     },
 
     extractMaHo() {
-      const match = this.maHso.match(/(H21|G22)\.\d{2}\.\d{2}-\d{6}-\d{4}/);
-      const match2 = this.maHso2.match(/(H21|G22)\.\d{2}\.\d{2}-\d{6}-\d{4}/);
-      if (match) {
-        this.maHso = match[0]; // Gán lại chỉ phần cần lấy
-      } else if (match2) {
-        this.maHso2 = match2[0];
-      } else {
+      const text = this.maHso2;
+      
+      // Tìm mã H21
+      const h21Match = text.match(/H21\.\d{3}-\d{6}-\d{4}/);
+      
+      // Tìm mã G22
+      const g22Match = text.match(/G22\.\d{2}\.\d{2}-\d{6}-\d{6}/);
+      
+      if (!h21Match && !g22Match) {
         alert("Không tìm thấy mã hồ sơ hợp lệ!");
+        return;
+      }
+      
+      if (h21Match) {
+        this.maHso2 = h21Match[0];
+      }
+      
+      if (g22Match) {
+        this.maHso = g22Match[0];
       }
     },
 
@@ -841,9 +860,96 @@ export default {
       }
     },
 
+    processBodyForUpdate(body) {
+      if (!body) return body;
+
+      const looksLikeJson = (str) => {
+        if (typeof str !== "string") return false;
+        const s = str.trim();
+        return s.startsWith("{") || s.startsWith("[");
+      };
+
+      const normalizeNks = (obj) => {
+        if (!obj || typeof obj !== "object") return;
+
+        if (Array.isArray(obj)) {
+          for (let i = 0; i < obj.length; i++) {
+            const v = obj[i];
+            if (typeof v === "object") normalizeNks(v);
+            else if (typeof v === "string" && looksLikeJson(v)) {
+              try {
+                const parsed = JSON.parse(v);
+                normalizeNks(parsed);
+                obj[i] = JSON.stringify(parsed);
+              } catch (e) {}
+            }
+          }
+          return;
+        }
+
+        for (const key of Object.keys(obj)) {
+          const val = obj[key];
+
+          // If this is the target field, normalize it
+          if (key === "nksQueQuan") {
+            if (val && typeof val === "object") {
+              const dc = val.dcChiTiet;
+              if (dc === null || dc === undefined || (typeof dc === "string" && dc.trim() === "")) {
+                obj[key] = "";
+              } else if (typeof dc === "object") {
+                try {
+                  obj[key] = JSON.stringify(dc);
+                } catch (e) {
+                  obj[key] = "";
+                }
+              } else {
+                obj[key] = String(dc);
+              }
+            }
+            continue;
+          }
+
+          // If value is a JSON-string, try parsing and normalize inside it, then stringify back
+          if (typeof val === "string" && looksLikeJson(val)) {
+            try {
+              const parsed = JSON.parse(val);
+              normalizeNks(parsed);
+              obj[key] = JSON.stringify(parsed);
+            } catch (e) {
+              // not JSON, ignore
+            }
+          } else if (typeof val === "object" && val !== null) {
+            normalizeNks(val);
+          }
+        }
+      };
+
+      // Work on a shallow copy to avoid unexpected side-effects
+      normalizeNks(body);
+      return body;
+    },
+
+    normalizeTrangThaiSo4() {
+      if (!this.trangThaiSo4 || this.trangThaiSo4.trim() === "") {
+        this.log.push("⚠️ Không có nội dung để chuẩn hoá");
+        return;
+      }
+      try {
+        const parsed = JSON.parse(this.trangThaiSo4);
+        const normalized = this.processBodyForUpdate(parsed);
+        this.trangThaiSo4 = JSON.stringify(normalized, null, 2);
+        if (this.cmInstance) this.cmInstance.setValue(this.trangThaiSo4);
+        this.log.push("✅ Đã chuẩn hoá thân (trangThaiSo4)");
+      } catch (e) {
+        this.log.push(`❌ Lỗi khi chuẩn hoá: ${e.message}`);
+        console.error("Lỗi chuẩn hoá trangThaiSo4:", e);
+      }
+    },
+
     async callAgainFunction(isDialog) {
       console.log(this.callAgainTextarea);
       let bodyCall = {};
+      this.normalizeTrangThaiSo4();
       if (isDialog) {
         bodyCall = this.callAgainTextarea;
       } else {
@@ -856,28 +962,22 @@ export default {
           JSON.parse(bodyCall, null, 2),
           {
             headers: {
-              Authorization: `Bearer ${this.igateToken}`, // Đính kèm token vào header
+              Authorization: `Bearer ${this.igateToken}`,
             },
           }
         );
         if (response) {
           console.log(response.data);
           if (response.data.status == 200) {
-            alert(response.data.title);
+            this.log.push(`✅ ${response.data.title}`);
           } else {
-            alert(response.data.errors.soHoSoLT[0]);
+            this.log.push(`❌ ${response.data.errors.soHoSoLT[0]}`);
           }
         }
       } catch (error) {
-        alert(error);
-        if (error.response) {
-          console.error("Dữ liệu phản hồi lỗi:", error.response.data);
-          console.error("Trạng thái phản hồi lỗi:", error.response.status);
-        } else if (error.request) {
-          console.error("Yêu cầu lỗi:", error.request);
-        } else {
-          console.error("Thông báo lỗi:", error.message);
-        }
+        const errorMsg = error.response?.data?.message || error.message;
+        this.log.push(`❌ Lỗi: ${errorMsg}`);
+        console.error("Lỗi cập nhật:", error);
       }
     },
 
