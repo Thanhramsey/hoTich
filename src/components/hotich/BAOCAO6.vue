@@ -66,7 +66,8 @@
             >
             <v-btn
               @click="fetchData"
-               :disabled="loading"
+              :loading="loading"
+              :disabled="loading"
               style="
                 color: white;
                 font-weight: bold;
@@ -91,6 +92,8 @@
 
             <v-btn
               @click="runProcess"
+              :loading="loadingRunProcess"
+              :disabled="loadingRunProcess"
               style="
                 color: white;
                 font-weight: bold;
@@ -107,6 +110,8 @@
             >
             <v-btn
               @click="runProcess2"
+              :loading="loadingRunProcess2"
+              :disabled="loadingRunProcess2"
               style="
                 color: white;
                 font-weight: bold;
@@ -139,6 +144,8 @@
             > -->
             <v-btn
               @click="endHoSo"
+              :loading="loadingEndHoSo"
+              :disabled="loadingEndHoSo"
               variant="outlined"
               style="
                 color: white;
@@ -265,6 +272,8 @@
               <v-btn
                 small
                 color="primary"
+                :loading="loadingNormalize"
+                :disabled="loadingNormalize"
                 style="position: absolute; top: 4px; right: 180px; z-index: 1"
                 @click="normalizeTrangThaiSo4"
               >
@@ -273,6 +282,8 @@
               <v-btn
                 small
                 color="success"
+                :loading="loadingCallAgain"
+                :disabled="loadingCallAgain"
                 style="position: absolute; top: 4px; right: 24px; z-index: 1"
                 @click="callAgainFunction(false)"
               >
@@ -347,6 +358,8 @@
             <v-card-actions>
               <v-btn
                 color="primary"
+                :loading="loadingCallAgain"
+                :disabled="loadingCallAgain"
                 @click="callAgainFunction(true)"
                 style="
                   color: white;
@@ -511,6 +524,11 @@ export default {
       ketQua: "",
       loading: false,
       loading2: false,
+      loadingRunProcess: false,
+      loadingRunProcess2: false,
+      loadingEndHoSo: false,
+      loadingCallAgain: false,
+      loadingNormalize: false,
       module: "",
       hsoId: "",
       dialog: false,
@@ -595,10 +613,14 @@ export default {
     },
 
     async endHoSo() {
-      this.loading = true;
-      await this.getHsoId();
-      if (this.hsoId) {
-        await this.endProcess();
+      this.loadingEndHoSo = true;
+      try {
+        await this.getHsoId();
+        if (this.hsoId) {
+          await this.endProcess();
+        }
+      } finally {
+        this.loadingEndHoSo = false;
       }
     },
 
@@ -930,11 +952,12 @@ export default {
     },
 
     normalizeTrangThaiSo4() {
-      if (!this.trangThaiSo4 || this.trangThaiSo4.trim() === "") {
-        this.log.push("⚠️ Không có nội dung để chuẩn hoá");
-        return;
-      }
+      this.loadingNormalize = true;
       try {
+        if (!this.trangThaiSo4 || this.trangThaiSo4.trim() === "") {
+          this.log.push("⚠️ Không có nội dung để chuẩn hoá");
+          return;
+        }
         const parsed = JSON.parse(this.trangThaiSo4);
         const normalized = this.processBodyForUpdate(parsed);
         this.trangThaiSo4 = JSON.stringify(normalized, null, 2);
@@ -943,11 +966,14 @@ export default {
       } catch (e) {
         this.log.push(`❌ Lỗi khi chuẩn hoá: ${e.message}`);
         console.error("Lỗi chuẩn hoá trangThaiSo4:", e);
+      } finally {
+        this.loadingNormalize = false;
       }
     },
 
     async callAgainFunction(isDialog) {
       console.log(this.callAgainTextarea);
+      this.loadingCallAgain = true;
       let bodyCall = {};
       this.normalizeTrangThaiSo4();
       if (isDialog) {
@@ -978,6 +1004,8 @@ export default {
         const errorMsg = error.response?.data?.message || error.message;
         this.log.push(`❌ Lỗi: ${errorMsg}`);
         console.error("Lỗi cập nhật:", error);
+      } finally {
+        this.loadingCallAgain = false;
       }
     },
 
@@ -1224,7 +1252,9 @@ export default {
     },
 
     async runProcess2() {
-      const object1 = await this.getObject1();
+      this.loadingRunProcess2 = true;
+      try {
+        const object1 = await this.getObject1();
 
       const syncResult = await this.callSyncAPI(object1.code);
 
@@ -1274,9 +1304,13 @@ export default {
       } else {
         this.trangThaiSo4 = JSON.stringify(syncResult, null, 2);
       }
+    } finally {
+      this.loadingRunProcess2 = false;
+    }
     },
 
     async runProcess() {
+      this.loadingRunProcess = true;
       this.log = [];
       try {
         this.log.push("🔍 Đang lấy thông tin hồ sơ...");
@@ -1312,6 +1346,8 @@ export default {
         await this.waitForTrangThai4(object1);
       } catch (err) {
         this.log.push(`❌ Lỗi: ${err.response?.data?.message || err.message}`);
+      } finally {
+        this.loadingRunProcess = false;
       }
     },
   },
